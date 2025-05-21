@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.saas.auth.common.ApiResponse;
 import com.saas.auth.context.TenantContext;
 import com.saas.auth.entity.User;
 import com.saas.auth.mapper.UserMapper;
 import com.saas.auth.service.UserService;
+import com.saas.auth.util.JwtUtil;
 
-import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,28 +37,21 @@ public class SsoServerController {
     @Autowired
     private UserMapper userMapper;
     
+    @Autowired
+    private JwtUtil jwtUtil;
+    
     /**
      * SSO-Server端：处理认证请求
      */
     @GetMapping("/auth")
-    public RedirectView auth(@RequestParam(required = false) String redirect) {
-        // 如果已经登录，直接返回令牌
-        if (StpUtil.isLogin()) {
-            if (redirect != null && !redirect.isEmpty()) {
-                // 构建返回URL，附带token
-                String token = StpUtil.getTokenValue();
-                String redirectUrl = redirect + "?token=" + token + "&userId=" + StpUtil.getLoginIdAsString();
-                return new RedirectView(redirectUrl);
-            }
-        }
-        
-        // 未登录，跳转到登录页面
+    public ModelAndView auth(@RequestParam(required = false) String redirect) {
+        // 重定向到登录页面
         String loginUrl = "/api/sso/sso-login.html";
         if (redirect != null && !redirect.isEmpty()) {
             loginUrl += "?back=" + redirect;
         }
         
-        return new RedirectView(loginUrl);
+        return new ModelAndView("redirect:" + loginUrl);
     }
     
     /**
@@ -80,14 +73,11 @@ public class SsoServerController {
             
             // 此处简化了密码验证，实际应用中应该进行加密比对
             if ("123456".equals(password)) {
-                // 登录成功，使用 user id 作为登录标识
-                StpUtil.login(user.getId());
+                // 生成JWT令牌
+                String token = jwtUtil.generateToken(user.getUsername(), user.getTenantId());
                 
-                // 返回令牌信息给前端，用于后续的认证
-                String token = StpUtil.getTokenValue();
-                
+                // 如果有回调地址，返回令牌用于SSO重定向
                 if (back != null && !back.isEmpty()) {
-                    // 如果有回调地址，返回重定向用的令牌
                     return ApiResponse.success(token);
                 }
                 
@@ -107,14 +97,15 @@ public class SsoServerController {
     @GetMapping("/userinfo")
     public ApiResponse userinfo(@RequestParam String token) {
         try {
-            // 验证令牌有效性
-            Object loginId = StpUtil.getLoginIdByToken(token);
-            if (loginId == null) {
+            // 验证JWT令牌
+            String username = jwtUtil.getUsernameFromToken(token);
+            Long tenantId = jwtUtil.getTenantIdFromToken(token);
+            
+            if (username == null || tenantId == null) {
                 return ApiResponse.error("无效的令牌");
             }
             
-            Long userId = Long.valueOf(loginId.toString());
-            User user = userMapper.selectById(userId);
+            User user = userMapper.selectByUsernameAndTenantId(username, tenantId);
             if (user == null) {
                 return ApiResponse.error("用户不存在");
             }
@@ -131,17 +122,13 @@ public class SsoServerController {
      * 单点登出
      */
     @GetMapping("/logout")
-    public RedirectView logout(@RequestParam(required = false) String redirect) {
-        if (StpUtil.isLogin()) {
-            StpUtil.logout();
-        }
-        
+    public ModelAndView logout(@RequestParam(required = false) String redirect) {
         // 如果有回调地址，跳转回去
         if (redirect != null && !redirect.isEmpty()) {
-            return new RedirectView(redirect);
+            return new ModelAndView("redirect:" + redirect);
         }
         
         // 否则跳转到登录页
-        return new RedirectView("/api/sso/sso-login.html");
+        return new ModelAndView("redirect:/api/sso/sso-login.html");
     }
 }

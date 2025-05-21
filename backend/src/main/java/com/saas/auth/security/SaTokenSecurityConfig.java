@@ -6,14 +6,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
- * Sa-Token 与 Spring Security 整合配置
+ * SSO相关安全配置
  */
 @Configuration
 public class SaTokenSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // 允许所有请求通过，后续使用Sa-Token进行权限控制
+        // 允许所有请求通过，使用JWT进行验证
         http
             .csrf().disable() 
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -31,6 +31,6 @@ public class SaTokenSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/role/**").permitAll()
             .antMatchers("/permission/**").permitAll()
             .antMatchers("/tenant/**").permitAll()
-            .anyRequest().permitAll(); // 允许所有请求，通过Sa-Token自行控制
+            .anyRequest().permitAll(); // 允许所有请求，使用JWT控制
     }
 }
