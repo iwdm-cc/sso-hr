@@ -35,7 +35,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd frontend && npm run serve -- --host 0.0.0.0"
+args = "cd frontend && vue-cli-service serve --host 0.0.0.0 --port 5000 --config vue.config.basic.js"
 waitForPort = 5000
 
 [deployment]
