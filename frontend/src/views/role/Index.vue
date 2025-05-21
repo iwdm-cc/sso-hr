@@ -116,12 +116,26 @@ export default {
     // 获取角色列表
     fetchRoles() {
       this.loading = true;
-      this.$store.dispatch('role/getRoles', {
-        ...this.searchForm,
-        ...this.pageParams
-      }).finally(() => {
-        this.loading = false;
-      });
+      const params = {
+        name: this.searchForm.name,
+        status: this.searchForm.status,
+        current: this.pageParams.current,
+        size: this.pageParams.size
+      };
+      
+      console.log('请求参数:', params);
+      
+      this.$store.dispatch('role/getRoles', params)
+        .then(data => {
+          console.log('角色数据获取成功:', data);
+        })
+        .catch(error => {
+          console.error('获取角色数据失败:', error);
+          this.$message.error('获取角色列表失败');
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     
     // 处理搜索

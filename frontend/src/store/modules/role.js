@@ -1,13 +1,13 @@
 import { getRoles, getRoleById, createRole, updateRole, deleteRole, assignPermissions, getRolePermissions } from '@/api/role'
 
 const state = {
-  roleList: [],
+  roles: [],
   total: 0
 }
 
 const mutations = {
   SET_ROLE_LIST: (state, list) => {
-    state.roleList = list
+    state.roles = list
   },
   SET_TOTAL: (state, total) => {
     state.total = total
@@ -105,7 +105,7 @@ const actions = {
 }
 
 const getters = {
-  roleList: state => state.roleList,
+  roleList: state => state.roles,
   total: state => state.total
 }
 
