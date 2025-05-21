@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取租户列表
 export function getTenants(params) {
   return request({
-    url: '/tenant/list',
+    url: '/api/tenant/list',
     method: 'get',
     params
   })

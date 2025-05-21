@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取权限列表
 export function getPermissions(params) {
   return request({
-    url: '/permission/list',
+    url: '/api/permission/list',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export function getPermissions(params) {
 // 获取指定权限
 export function getPermissionById(id) {
   return request({
-    url: `/permission/${id}`,
+    url: `/api/permission/${id}`,
     method: 'get'
   })
 }
