@@ -1,8 +1,8 @@
-modules = ["nodejs-20", "postgresql-16"]
+modules = ["nodejs-20", "postgresql-16", "python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["maven", "openjdk11", "git"]
+packages = ["git", "maven", "openjdk11"]
 
 [workflows]
 runButton = "Project"
@@ -23,6 +23,10 @@ args = "Frontend Server"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "SSO Client"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Python SSO Client"
 
 [[workflows.workflow]]
 name = "Backend Server"
@@ -51,12 +55,25 @@ task = "shell.exec"
 args = "cd sso-client-node && node app.js"
 waitForPort = 9001
 
+[[workflows.workflow]]
+name = "Python SSO Client"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd sso-client-python && python app.py"
+waitForPort = 7000
+
 [deployment]
 run = ["sh", "-c", "cd backend && ./mvnw spring-boot:run"]
 
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 7000
+externalPort = 3002
 
 [[ports]]
 localPort = 8000
