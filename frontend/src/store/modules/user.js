@@ -97,36 +97,19 @@ const actions = {
   // 获取用户列表
   getUsers({ commit }, query) {
     return new Promise((resolve, reject) => {
-      // 使用静态数据进行演示
-      setTimeout(() => {
-        const mockUsers = [
-          { id: 1, username: 'admin', name: '系统管理员', email: 'admin@example.com', phone: '13800000000', status: 1, createTime: '2023-01-01 00:00:00' },
-          { id: 2, username: 'test', name: '测试用户', email: 'test@example.com', phone: '13900000000', status: 1, createTime: '2023-01-02 00:00:00' },
-          { id: 3, username: 'user1', name: '普通用户1', email: 'user1@example.com', phone: '13700000000', status: 1, createTime: '2023-01-03 00:00:00' },
-          { id: 4, username: 'user2', name: '普通用户2', email: 'user2@example.com', phone: '13600000000', status: 0, createTime: '2023-01-04 00:00:00' }
-        ]
-        
-        // 按照查询条件过滤
-        let filteredUsers = [...mockUsers]
-        if (query.username) {
-          filteredUsers = filteredUsers.filter(user => user.username.includes(query.username))
-        }
-        if (query.name) {
-          filteredUsers = filteredUsers.filter(user => user.name.includes(query.name))
-        }
-        if (query.status !== '' && query.status !== undefined) {
-          filteredUsers = filteredUsers.filter(user => user.status === parseInt(query.status))
-        }
-        
-        const mockData = {
-          list: filteredUsers,
-          total: filteredUsers.length
-        }
-        
-        commit('SET_USER_LIST', mockData.list)
-        commit('SET_TOTAL', mockData.total)
-        resolve(mockData)
-      }, 500)
+      // 从后端获取真实数据
+      getUsers(query).then(response => {
+        const { data } = response
+        commit('SET_USER_LIST', data.list)
+        commit('SET_TOTAL', data.total)
+        resolve(data)
+      }).catch(error => {
+        console.error('获取用户列表失败:', error)
+        // 出错时回退使用空数组
+        commit('SET_USER_LIST', [])
+        commit('SET_TOTAL', 0)
+        reject(error)
+      })
     })
   },
 

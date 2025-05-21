@@ -18,40 +18,19 @@ const actions = {
   // 获取权限列表
   getPermissions({ commit }, query) {
     return new Promise((resolve, reject) => {
-      // 使用模拟数据
-      setTimeout(() => {
-        const mockPermissions = [
-          { id: 1, name: '系统管理', code: 'system:view', type: 'menu', resourcePath: '/system', createTime: '2023-01-01 00:00:00' },
-          { id: 2, name: '用户管理', code: 'user:view', type: 'menu', resourcePath: '/user', createTime: '2023-01-02 00:00:00' },
-          { id: 3, name: '角色管理', code: 'role:view', type: 'menu', resourcePath: '/role', createTime: '2023-01-03 00:00:00' },
-          { id: 4, name: '权限管理', code: 'permission:view', type: 'menu', resourcePath: '/permission', createTime: '2023-01-04 00:00:00' },
-          { id: 5, name: '租户管理', code: 'tenant:view', type: 'menu', resourcePath: '/tenant', createTime: '2023-01-05 00:00:00' },
-          { id: 6, name: '创建用户', code: 'user:create', type: 'button', resourcePath: null, createTime: '2023-01-06 00:00:00' },
-          { id: 7, name: '编辑用户', code: 'user:update', type: 'button', resourcePath: null, createTime: '2023-01-07 00:00:00' },
-          { id: 8, name: '删除用户', code: 'user:delete', type: 'button', resourcePath: null, createTime: '2023-01-08 00:00:00' }
-        ]
-        
-        // 按照查询条件过滤
-        let filteredPermissions = [...mockPermissions]
-        if (query.name) {
-          filteredPermissions = filteredPermissions.filter(perm => perm.name.includes(query.name))
-        }
-        if (query.code) {
-          filteredPermissions = filteredPermissions.filter(perm => perm.code.includes(query.code))
-        }
-        if (query.type) {
-          filteredPermissions = filteredPermissions.filter(perm => perm.type === query.type)
-        }
-        
-        const mockData = {
-          list: filteredPermissions,
-          total: filteredPermissions.length
-        }
-        
-        commit('SET_PERMISSION_LIST', mockData.list)
-        commit('SET_TOTAL', mockData.total)
-        resolve(mockData)
-      }, 500)
+      // 从后端获取真实数据
+      getPermissions(query).then(response => {
+        const { data } = response
+        commit('SET_PERMISSION_LIST', data.list)
+        commit('SET_TOTAL', data.total)
+        resolve(data)
+      }).catch(error => {
+        console.error('获取权限列表失败:', error)
+        // 处理失败时设置为空数组
+        commit('SET_PERMISSION_LIST', [])
+        commit('SET_TOTAL', 0)
+        reject(error)
+      })
     })
   },
 

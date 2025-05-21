@@ -18,34 +18,19 @@ const actions = {
   // 获取租户列表
   getTenants({ commit }, query) {
     return new Promise((resolve, reject) => {
-      // 使用模拟数据
-      setTimeout(() => {
-        const mockTenants = [
-          { id: 1, name: '系统管理租户', code: 'system', description: '系统默认租户', status: 1, createTime: '2023-01-01 00:00:00' },
-          { id: 2, name: '测试租户', code: 'test', description: '用于测试的租户', status: 1, createTime: '2023-01-02 00:00:00' },
-          { id: 3, name: '开发租户', code: 'dev', description: '开发使用的租户', status: 1, createTime: '2023-01-03 00:00:00' },
-          { id: 4, name: '生产租户', code: 'prod', description: '生产环境租户', status: 1, createTime: '2023-01-04 00:00:00' },
-          { id: 5, name: '禁用租户', code: 'disabled', description: '已禁用的租户', status: 0, createTime: '2023-01-05 00:00:00' }
-        ]
-        
-        // 按照查询条件过滤
-        let filteredTenants = [...mockTenants]
-        if (query.name) {
-          filteredTenants = filteredTenants.filter(tenant => tenant.name.includes(query.name))
-        }
-        if (query.status !== '' && query.status !== undefined) {
-          filteredTenants = filteredTenants.filter(tenant => tenant.status === parseInt(query.status))
-        }
-        
-        const mockData = {
-          list: filteredTenants,
-          total: filteredTenants.length
-        }
-        
-        commit('SET_TENANT_LIST', mockData.list)
-        commit('SET_TOTAL', mockData.total)
-        resolve(mockData)
-      }, 500)
+      // 从后端获取真实数据
+      getTenants(query).then(response => {
+        const { data } = response
+        commit('SET_TENANT_LIST', data.list)
+        commit('SET_TOTAL', data.total)
+        resolve(data)
+      }).catch(error => {
+        console.error('获取租户列表失败:', error)
+        // 处理失败时设置为空数组
+        commit('SET_TENANT_LIST', [])
+        commit('SET_TOTAL', 0)
+        reject(error)
+      })
     })
   },
 
