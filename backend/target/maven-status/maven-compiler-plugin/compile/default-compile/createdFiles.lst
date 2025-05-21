@@ -45,4 +45,3 @@ com/saas/auth/service/UserService.class
 com/saas/auth/security/JwtTokenProvider.class
 com/saas/auth/common/ApiResponse.class
 com/saas/auth/service/impl/PermissionServiceImpl.class
-com/saas/auth/security/TenantContext.class

@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserById(Long id) {
         User user = userMapper.selectById(id);
-        if (user == null || !user.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (user == null || !user.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("用户不存在");
         }
         
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void createUser(UserDTO userDTO) {
         // 检查用户名是否已存在
-        User existUser = userMapper.selectByUsernameAndTenantId(userDTO.getUsername(), TenantContext.getCurrentTenant());
+        User existUser = userMapper.selectByUsernameAndTenantId(userDTO.getUsername(), TenantContext.getTenantId());
         if (existUser != null) {
             throw new CustomException("用户名已存在");
         }
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         
         // 设置租户ID
-        user.setTenantId(TenantContext.getCurrentTenant());
+        user.setTenantId(TenantContext.getTenantId());
         
         userMapper.insert(user);
         
@@ -130,12 +130,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(UserDTO userDTO) {
         User user = userMapper.selectById(userDTO.getId());
-        if (user == null || !user.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (user == null || !user.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("用户不存在");
         }
         
         // 检查用户名是否已存在（排除自身）
-        User existUser = userMapper.selectByUsernameAndTenantId(userDTO.getUsername(), TenantContext.getCurrentTenant());
+        User existUser = userMapper.selectByUsernameAndTenantId(userDTO.getUsername(), TenantContext.getTenantId());
         if (existUser != null && !existUser.getId().equals(userDTO.getId())) {
             throw new CustomException("用户名已存在");
         }
@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = userMapper.selectById(id);
-        if (user == null || !user.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (user == null || !user.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("用户不存在");
         }
         
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void assignRoles(Long userId, List<Long> roleIds) {
         User user = userMapper.selectById(userId);
-        if (user == null || !user.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (user == null || !user.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("用户不存在");
         }
         
@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> getCurrentUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Long tenantId = TenantContext.getCurrentTenant();
+        Long tenantId = TenantContext.getTenantId();
         
         User user = userMapper.selectByUsernameAndTenantId(username, tenantId);
         if (user == null) {
@@ -232,11 +232,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<String> getUserPermissions(Long userId) {
-        return userMapper.selectUserPermissions(userId, TenantContext.getCurrentTenant());
+        return userMapper.selectUserPermissions(userId, TenantContext.getTenantId());
     }
 
     @Override
     public void setCurrentTenant(Long tenantId) {
-        TenantContext.setCurrentTenant(tenantId);
+        TenantContext.setTenantId(tenantId);
     }
 }

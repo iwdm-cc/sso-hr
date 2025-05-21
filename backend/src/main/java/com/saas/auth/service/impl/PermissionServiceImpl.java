@@ -4,7 +4,7 @@ import com.saas.auth.dto.PermissionDTO;
 import com.saas.auth.entity.Permission;
 import com.saas.auth.exception.CustomException;
 import com.saas.auth.mapper.PermissionMapper;
-import com.saas.auth.security.TenantContext;
+import com.saas.auth.context.TenantContext;
 import com.saas.auth.service.PermissionService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public List<PermissionDTO> getRolePermissions(Long roleId) {
-        List<Permission> permissions = permissionMapper.selectPermissionsByRoleId(roleId, TenantContext.getCurrentTenant());
+        List<Permission> permissions = permissionMapper.selectPermissionsByRoleId(roleId, TenantContext.getTenantId());
         return permissions.stream().map(permission -> {
             PermissionDTO permissionDTO = new PermissionDTO();
             BeanUtils.copyProperties(permission, permissionDTO);

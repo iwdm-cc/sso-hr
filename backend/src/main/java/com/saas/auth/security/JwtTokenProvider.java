@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import com.saas.auth.context.TenantContext;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,7 +78,7 @@ public class JwtTokenProvider {
 
         // 设置当前租户上下文
         Long tenantId = Long.parseLong(claims.get(TENANT_KEY).toString());
-        TenantContext.setCurrentTenant(tenantId);
+        TenantContext.setTenantId(tenantId);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

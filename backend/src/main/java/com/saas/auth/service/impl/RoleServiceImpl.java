@@ -36,7 +36,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Map<String, Object> getRoleList(int page, int pageSize, String keyword, Boolean status) {
         Page<Role> pageParam = new Page<>(page, pageSize);
-        Long tenantId = TenantContext.getCurrentTenant();
+        Long tenantId = TenantContext.getTenantId();
         Integer statusValue = (status != null) ? (status ? 1 : 0) : null;
         IPage<Role> pageResult = roleMapper.selectRolePage(pageParam, keyword, statusValue, tenantId);
         
@@ -55,7 +55,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDTO getRoleById(Long id) {
         Role role = roleMapper.selectById(id);
-        if (role == null || !role.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (role == null || !role.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("角色不存在");
         }
         
@@ -71,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
         BeanUtils.copyProperties(roleDTO, role);
         
         // 设置租户ID
-        role.setTenantId(TenantContext.getCurrentTenant());
+        role.setTenantId(TenantContext.getTenantId());
         
         roleMapper.insert(role);
     }
@@ -80,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public void updateRole(RoleDTO roleDTO) {
         Role role = roleMapper.selectById(roleDTO.getId());
-        if (role == null || !role.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (role == null || !role.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("角色不存在");
         }
         
@@ -92,7 +92,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public void deleteRole(Long id) {
         Role role = roleMapper.selectById(id);
-        if (role == null || !role.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (role == null || !role.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("角色不存在");
         }
         
@@ -109,7 +109,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public void assignPermissions(Long roleId, List<Long> permissionIds) {
         Role role = roleMapper.selectById(roleId);
-        if (role == null || !role.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (role == null || !role.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("角色不存在");
         }
         
@@ -124,7 +124,7 @@ public class RoleServiceImpl implements RoleService {
                 RolePermission rolePermission = new RolePermission();
                 rolePermission.setRoleId(roleId);
                 rolePermission.setPermissionId(permissionId);
-                rolePermission.setTenantId(TenantContext.getCurrentTenant());
+                rolePermission.setTenantId(TenantContext.getTenantId());
                 rolePermissionMapper.insert(rolePermission);
             }
         }
@@ -132,7 +132,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDTO> getUserRoles(Long userId) {
-        List<Role> roles = roleMapper.selectRolesByUserId(userId, TenantContext.getCurrentTenant());
+        List<Role> roles = roleMapper.selectRolesByUserId(userId, TenantContext.getTenantId());
         return roles.stream().map(role -> {
             RoleDTO roleDTO = new RoleDTO();
             BeanUtils.copyProperties(role, roleDTO);
@@ -143,11 +143,11 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Long> getRolePermissionIds(Long roleId) {
         Role role = roleMapper.selectById(roleId);
-        if (role == null || !role.getTenantId().equals(TenantContext.getCurrentTenant())) {
+        if (role == null || !role.getTenantId().equals(TenantContext.getTenantId())) {
             throw new CustomException("角色不存在");
         }
         
-        return roleMapper.selectRolesByUserId(roleId, TenantContext.getCurrentTenant())
+        return roleMapper.selectRolesByUserId(roleId, TenantContext.getTenantId())
                 .stream()
                 .map(Role::getId)
                 .collect(Collectors.toList());

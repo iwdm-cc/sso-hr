@@ -1,5 +1,6 @@
 package com.saas.auth.security;
 
+import com.saas.auth.context.TenantContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
