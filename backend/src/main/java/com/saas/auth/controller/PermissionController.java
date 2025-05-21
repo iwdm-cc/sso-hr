@@ -17,7 +17,7 @@ import java.util.List;
  * 权限管理控制器
  */
 @RestController
-@RequestMapping("/api/permission")
+@RequestMapping("/permission")
 @Tag(name = "权限管理", description = "权限的CRUD操作")
 public class PermissionController {
 

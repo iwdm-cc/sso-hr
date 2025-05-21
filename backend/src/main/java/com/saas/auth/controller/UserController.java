@@ -19,7 +19,7 @@ import java.util.Map;
  * 用户管理控制器
  */
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 @Tag(name = "用户管理", description = "用户的CRUD操作")
 public class UserController {
 

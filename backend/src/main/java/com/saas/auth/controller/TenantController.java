@@ -18,7 +18,7 @@ import java.util.Map;
  * 租户管理控制器
  */
 @RestController
-@RequestMapping("/api/tenant")
+@RequestMapping("/tenant")
 @Tag(name = "租户管理", description = "租户的CRUD操作")
 public class TenantController {
 

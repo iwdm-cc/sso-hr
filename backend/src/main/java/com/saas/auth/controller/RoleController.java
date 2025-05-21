@@ -18,7 +18,7 @@ import java.util.Map;
  * 角色管理控制器
  */
 @RestController
-@RequestMapping("/api/role")
+@RequestMapping("/role")
 @Tag(name = "角色管理", description = "角色的CRUD操作")
 public class RoleController {
 
