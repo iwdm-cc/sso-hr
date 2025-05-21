@@ -68,20 +68,17 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   document.title = to.meta.title || 'SaaS多租户用户权限管理系统'
   
-  const hasToken = getToken()
-  
-  if (to.meta.requireAuth) {
-    if (hasToken) {
-      next()
+  // 简化路由守卫逻辑
+  if (to.path === '/login') {
+    // 已登录时访问登录页，重定向到仪表盘
+    if (localStorage.getItem('token')) {
+      next({ path: '/dashboard' })
     } else {
-      next(`/login?redirect=${to.path}`)
+      next()
     }
   } else {
-    if (hasToken && to.path === '/login') {
-      next({ path: '/' })
-    } else {
-      next()
-    }
+    // 非登录页面，直接放行
+    next()
   }
 })
 
