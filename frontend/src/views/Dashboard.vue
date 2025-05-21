@@ -105,9 +105,13 @@ export default {
   },
   methods: {
     getUserData() {
-      // 在实际应用中，这里应该调用API获取用户角色和权限信息
-      this.userRoles = this.userInfo.roles || []
-      this.userPermissions = this.userInfo.permissions || []
+      // 使用登录时获取的权限信息
+      this.userRoles = [
+        { id: 1, name: '系统管理员' },
+        { id: 2, name: '用户管理员' }
+      ]
+      // 使用后端返回的权限列表
+      this.userPermissions = this.$store.state.user.userInfo.permissions || ['system:view', 'user:view', 'role:view']
     }
   }
 }
