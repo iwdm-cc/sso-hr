@@ -18,4 +18,12 @@
         </where>
         ORDER BY t.create_time DESC
     </select>
+    
+    <!-- 根据租户编码查询租户 -->
+    <select id="selectByCode" resultType="com.saas.auth.entity.Tenant">
+        SELECT t.*
+        FROM sys_tenant t
+        WHERE t.code = #{code}
+        LIMIT 1
+    </select>
 </mapper>

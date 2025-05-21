@@ -37,7 +37,8 @@ public class RoleServiceImpl implements RoleService {
     public Map<String, Object> getRoleList(int page, int pageSize, String keyword, Boolean status) {
         Page<Role> pageParam = new Page<>(page, pageSize);
         Long tenantId = TenantContext.getCurrentTenant();
-        IPage<Role> pageResult = roleMapper.selectRolePage(pageParam, keyword, status, tenantId);
+        Integer statusValue = (status != null) ? (status ? 1 : 0) : null;
+        IPage<Role> pageResult = roleMapper.selectRolePage(pageParam, keyword, statusValue, tenantId);
         
         List<RoleDTO> roleDTOs = pageResult.getRecords().stream().map(role -> {
             RoleDTO roleDTO = new RoleDTO();

@@ -1,0 +1,9 @@
+com/saas/auth/entity/User.class
+com/saas/auth/entity/Role.class
+com/saas/auth/service/UserService.class
+com/saas/auth/mapper/UserMapper.class
+com/saas/auth/dto/LoginResponse.class
+com/saas/auth/common/BaseEntity.class
+com/saas/auth/exception/CustomException.class
+com/saas/auth/dto/RoleDTO.class
+com/saas/auth/dto/UserDTO.class

@@ -65,7 +65,7 @@ public class AuthController {
         User user = userMapper.selectByUsernameAndTenantId(loginRequest.getUsername(), tenant.getId());
         
         // 4. 生成JWT令牌
-        String token = jwtUtil.generateToken(authentication.getPrincipal(), tenant.getId());
+        String token = jwtUtil.generateToken((org.springframework.security.core.userdetails.UserDetails)authentication.getPrincipal(), tenant.getId());
         
         // 5. 查询用户权限
         List<String> permissions = userMapper.selectUserPermissions(user.getId(), tenant.getId());

@@ -66,7 +66,8 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> getUserList(int page, int pageSize, String keyword, Boolean status) {
         Page<User> pageParam = new Page<>(page, pageSize);
         Long tenantId = TenantContext.getCurrentTenant();
-        IPage<User> pageResult = userMapper.selectUserPage(pageParam, keyword, status, tenantId);
+        Integer statusValue = (status != null) ? (status ? 1 : 0) : null;
+        IPage<User> pageResult = userMapper.selectUserPage(pageParam, keyword, statusValue, tenantId);
         
         List<UserDTO> userDTOs = pageResult.getRecords().stream().map(user -> {
             UserDTO userDTO = new UserDTO();
