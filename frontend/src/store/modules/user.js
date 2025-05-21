@@ -128,26 +128,16 @@ const actions = {
   // 创建用户
   createUser({ commit }, user) {
     return new Promise((resolve, reject) => {
-      // 使用模拟数据处理用户创建
-      setTimeout(() => {
-        // 模拟成功响应
-        const mockResponse = {
-          code: 200,
-          message: '用户创建成功',
-          data: {
-            ...user,
-            id: Math.floor(Math.random() * 1000) + 10, // 生成随机ID
-            createTime: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0]
-          }
-        };
-        
-        // 添加到用户列表
-        const newUser = mockResponse.data;
-        commit('SET_USER_LIST', [...state.userList, newUser]);
-        
-        resolve(mockResponse);
-      }, 500);
-    })
+      // 调用实际的后端API创建用户
+      console.log('提交创建用户数据:', user);
+      createUser(user).then(response => {
+        console.log('创建用户成功:', response);
+        resolve(response);
+      }).catch(error => {
+        console.error('创建用户API错误:', error);
+        reject(error);
+      });
+    });
   },
 
   // 更新用户
