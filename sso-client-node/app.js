@@ -7,14 +7,14 @@ const path = require('path');
 const app = express();
 const port = 9001;
 
-// 配置SSO服务器地址
-const SSO_SERVER = 'http://localhost:8000/api';
+// 配置SSO服务器地址 - 使用0.0.0.0替代localhost以确保连接性
+const SSO_SERVER = 'http://0.0.0.0:8000/api';
 const SSO_AUTH_URL = `${SSO_SERVER}/sso/auth`;
 const SSO_USERINFO_URL = `${SSO_SERVER}/sso/userinfo`;
 const SSO_LOGOUT_URL = `${SSO_SERVER}/sso/logout`;
 
-// 客户端回调地址
-const CLIENT_CALLBACK_URL = `http://localhost:${port}/sso/callback`;
+// 客户端回调地址 - 使用0.0.0.0替代localhost
+const CLIENT_CALLBACK_URL = `http://0.0.0.0:${port}/sso/callback`;
 
 // 中间件配置
 app.use(express.json());
