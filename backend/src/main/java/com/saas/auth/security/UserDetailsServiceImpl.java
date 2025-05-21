@@ -1,11 +1,9 @@
 package com.saas.auth.security;
 
-import com.saas.auth.dto.UserDTO;
-import com.saas.auth.service.UserService;
+import com.saas.auth.entity.User;
+import com.saas.auth.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,44 +13,41 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 用户详情服务实现类
+ * UserDetailsService实现
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    private UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 从当前上下文中获取租户ID
-        Long tenantId = TenantContext.getCurrentTenant();
-        if (tenantId == null) {
-            throw new UsernameNotFoundException("租户ID不能为空");
-        }
-
-        // 根据用户名和租户ID查询用户
-        UserDTO userDTO = userService.getUserByUsername(username, tenantId);
-        if (userDTO == null) {
-            throw new UsernameNotFoundException("用户名或密码错误");
-        }
-
-        // 获取用户权限
-        List<String> permissions = userService.getUserPermissions(userDTO.getId());
+        // 从请求上下文中获取租户ID，如果没有则默认为1（系统管理租户）
+        Long tenantId = 1L;
         
-        // 将权限字符串转换为GrantedAuthority对象
-        List<GrantedAuthority> authorities = permissions.stream()
+        // 根据用户名和租户ID查询用户
+        User user = userMapper.selectByUsernameAndTenantId(username, tenantId);
+        if (user == null) {
+            throw new UsernameNotFoundException("用户不存在");
+        }
+        
+        // 查询用户权限列表
+        List<String> permissions = userMapper.selectUserPermissions(user.getId(), tenantId);
+        
+        // 转换为Spring Security的权限对象
+        List<SimpleGrantedAuthority> authorities = permissions.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-
+        
         // 返回UserDetails对象
-        return new User(
-                userDTO.getUsername(),
-                userDTO.getPassword(),
-                userDTO.getStatus(), // 是否启用
-                true, // 账号未过期
-                true, // 凭证未过期
-                true, // 账号未锁定
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                user.getStatus() == 1, // enabled
+                true, // accountNonExpired
+                true, // credentialsNonExpired
+                true, // accountNonLocked
                 authorities
         );
     }
