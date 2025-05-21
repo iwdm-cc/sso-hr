@@ -18,14 +18,34 @@ const actions = {
   // 获取角色列表
   getRoles({ commit }, query) {
     return new Promise((resolve, reject) => {
-      getRoles(query).then(response => {
-        const { data } = response
-        commit('SET_ROLE_LIST', data.list)
-        commit('SET_TOTAL', data.total)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
+      // 使用模拟数据
+      setTimeout(() => {
+        const mockRoles = [
+          { id: 1, name: '超级管理员', code: 'ROLE_SUPER_ADMIN', description: '拥有所有权限', status: 1, createTime: '2023-01-01 00:00:00' },
+          { id: 2, name: '系统管理员', code: 'ROLE_ADMIN', description: '管理系统基本功能', status: 1, createTime: '2023-01-02 00:00:00' },
+          { id: 3, name: '用户管理员', code: 'ROLE_USER_ADMIN', description: '管理用户相关功能', status: 1, createTime: '2023-01-03 00:00:00' },
+          { id: 4, name: '普通用户', code: 'ROLE_USER', description: '普通用户权限', status: 1, createTime: '2023-01-04 00:00:00' },
+          { id: 5, name: '访客', code: 'ROLE_GUEST', description: '只有查看权限', status: 0, createTime: '2023-01-05 00:00:00' }
+        ]
+        
+        // 按照查询条件过滤
+        let filteredRoles = [...mockRoles]
+        if (query.name) {
+          filteredRoles = filteredRoles.filter(role => role.name.includes(query.name))
+        }
+        if (query.status !== '' && query.status !== undefined) {
+          filteredRoles = filteredRoles.filter(role => role.status === parseInt(query.status))
+        }
+        
+        const mockData = {
+          list: filteredRoles,
+          total: filteredRoles.length
+        }
+        
+        commit('SET_ROLE_LIST', mockData.list)
+        commit('SET_TOTAL', mockData.total)
+        resolve(mockData)
+      }, 500)
     })
   },
 
