@@ -11,9 +11,9 @@ spring:
     url: jdbc:postgresql://ep-withered-fog-a5tv9dme.us-east-2.aws.neon.tech/neondb?sslmode=require
     username: neondb_owner
     password: npg_lsIFM6uGOx3N
-    schema: classpath:schema.sql
-    data: classpath:data.sql
-    initialization-mode: always
+  sql:
+    init:
+      mode: never
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
