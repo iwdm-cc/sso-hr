@@ -20,6 +20,10 @@ args = "Backend Server"
 task = "workflow.run"
 args = "Frontend Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "SSO Client"
+
 [[workflows.workflow]]
 name = "Backend Server"
 author = "agent"
@@ -38,6 +42,15 @@ task = "shell.exec"
 args = "cd frontend && vue-cli-service serve --host 0.0.0.0 --port 5000 --config vue.config.basic.js"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "SSO Client"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd sso-client-node && node app.js"
+waitForPort = 9001
+
 [deployment]
 run = ["sh", "-c", "cd backend && ./mvnw spring-boot:run"]
 
@@ -48,3 +61,11 @@ externalPort = 80
 [[ports]]
 localPort = 8000
 externalPort = 8000
+
+[[ports]]
+localPort = 9001
+externalPort = 3001
+
+[[ports]]
+localPort = 35729
+externalPort = 3000

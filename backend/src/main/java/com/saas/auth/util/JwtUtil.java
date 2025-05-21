@@ -85,6 +85,15 @@ public class JwtUtil {
     }
     
     /**
+     * 根据用户名生成token
+     */
+    public String generateToken(String username, Long tenantId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tenantId", tenantId);
+        return doGenerateToken(claims, username);
+    }
+    
+    /**
      * 生成token的具体实现
      */
     private String doGenerateToken(Map<String, Object> claims, String subject) {
