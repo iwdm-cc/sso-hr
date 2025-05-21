@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<String, Object> getUserList(int page, int pageSize, String keyword, Boolean status) {
         Page<User> pageParam = new Page<>(page, pageSize);
-        Long tenantId = TenantContext.getCurrentTenant();
+        Long tenantId = TenantContext.getTenantId();
         Integer statusValue = (status != null) ? (status ? 1 : 0) : null;
         IPage<User> pageResult = userMapper.selectUserPage(pageParam, keyword, statusValue, tenantId);
         
