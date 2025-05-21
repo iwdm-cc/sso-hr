@@ -2,27 +2,29 @@ package com.saas.auth.sso;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.saas.auth.common.ApiResponse;
 import com.saas.auth.context.TenantContext;
-import com.saas.auth.dto.UserDTO;
 import com.saas.auth.entity.User;
 import com.saas.auth.mapper.UserMapper;
 import com.saas.auth.service.UserService;
 
-import cn.dev33.satoken.context.SaHolder;
-import cn.dev33.satoken.sso.SaSsoHandle;
-import cn.dev33.satoken.sso.SaSsoProcessor;
-import cn.dev33.satoken.sso.SaSsoUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * SSO单点登录服务端控制器
+ * 简化实现版本，主要功能包括：
+ * 1. 提供登录认证
+ * 2. 提供用户信息查询
+ * 3. 提供单点登出
  */
 @Slf4j
 @RestController
@@ -36,30 +38,36 @@ public class SsoServerController {
     private UserMapper userMapper;
     
     /**
-     * SSO-Server端：处理所有SSO相关请求
+     * SSO-Server端：处理认证请求
      */
-    @RequestMapping("/*")
-    public Object ssoRequest() {
-        // 使用自定义登录页面，这里我们通过返回重定向来处理
-        // 检查是否是认证请求
-        if (SaHolder.getRequest().getParam("mode") != null && SaHolder.getRequest().getParam("mode").equals("simple")) {
-            // 重定向到自定义登录页
-            String loginUrl = "/api/sso/sso-login.html" 
-                + "?back=" + SaHolder.getRequest().getParam("back")
-                + "&type=" + SaHolder.getRequest().getParam("type");
-            SaHolder.getResponse().redirect(loginUrl);
-            return null;
+    @GetMapping("/auth")
+    public RedirectView auth(@RequestParam(required = false) String redirect) {
+        // 如果已经登录，直接返回令牌
+        if (StpUtil.isLogin()) {
+            if (redirect != null && !redirect.isEmpty()) {
+                // 构建返回URL，附带token
+                String token = StpUtil.getTokenValue();
+                String redirectUrl = redirect + "?token=" + token + "&userId=" + StpUtil.getLoginIdAsString();
+                return new RedirectView(redirectUrl);
+            }
         }
         
-        return SaSsoHandle.serverRequest();
+        // 未登录，跳转到登录页面
+        String loginUrl = "/api/sso/sso-login.html";
+        if (redirect != null && !redirect.isEmpty()) {
+            loginUrl += "?back=" + redirect;
+        }
+        
+        return new RedirectView(loginUrl);
     }
     
     /**
-     * 配置SSO登录回调逻辑
+     * 处理登录请求
      */
-    @RequestMapping(value = "/doLogin", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/doLogin", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ApiResponse doLogin(String username, String password) {
+    public ApiResponse doLogin(@RequestParam String username, @RequestParam String password,
+                              @RequestParam(required = false) String back) {
         try {
             // 设置租户上下文，使用系统默认租户进行认证
             TenantContext.setTenantId(1L);
@@ -71,17 +79,16 @@ public class SsoServerController {
             }
             
             // 此处简化了密码验证，实际应用中应该进行加密比对
-            // 目前为了测试方便，暂时简化验证过程
             if ("123456".equals(password)) {
                 // 登录成功，使用 user id 作为登录标识
                 StpUtil.login(user.getId());
                 
-                // 在登录成功后，如果是通过SSO认证而来的，则要重定向回客户端应用
-                String back = SaHolder.getRequest().getParam("back");
-                if(back != null && !back.isEmpty()) {
-                    // 获取ticket并返回给前端用于跳转
-                    String ticket = SaSsoUtil.createTicket(user.getId().toString());
-                    return ApiResponse.success(ticket);
+                // 返回令牌信息给前端，用于后续的认证
+                String token = StpUtil.getTokenValue();
+                
+                if (back != null && !back.isEmpty()) {
+                    // 如果有回调地址，返回重定向用的令牌
+                    return ApiResponse.success(token);
                 }
                 
                 return ApiResponse.success("登录成功");
@@ -97,10 +104,16 @@ public class SsoServerController {
     /**
      * 查询用户信息
      */
-    @RequestMapping("/userinfo")
-    public Object userinfo(String loginId) {
+    @GetMapping("/userinfo")
+    public ApiResponse userinfo(@RequestParam String token) {
         try {
-            Long userId = Long.valueOf(loginId);
+            // 验证令牌有效性
+            Object loginId = StpUtil.getLoginIdByToken(token);
+            if (loginId == null) {
+                return ApiResponse.error("无效的令牌");
+            }
+            
+            Long userId = Long.valueOf(loginId.toString());
             User user = userMapper.selectById(userId);
             if (user == null) {
                 return ApiResponse.error("用户不存在");
@@ -112,5 +125,23 @@ public class SsoServerController {
             log.error("SSO获取用户信息失败", e);
             return ApiResponse.error("获取用户信息失败: " + e.getMessage());
         }
+    }
+    
+    /**
+     * 单点登出
+     */
+    @GetMapping("/logout")
+    public RedirectView logout(@RequestParam(required = false) String redirect) {
+        if (StpUtil.isLogin()) {
+            StpUtil.logout();
+        }
+        
+        // 如果有回调地址，跳转回去
+        if (redirect != null && !redirect.isEmpty()) {
+            return new RedirectView(redirect);
+        }
+        
+        // 否则跳转到登录页
+        return new RedirectView("/api/sso/sso-login.html");
     }
 }
