@@ -18,6 +18,7 @@ import com.saas.auth.service.RoleService;
 import com.saas.auth.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDateTime;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -117,6 +118,9 @@ public class UserServiceImpl implements UserService {
         
         // 设置租户ID
         user.setTenantId(TenantContext.getTenantId());
+        
+        // 设置创建时间
+        user.setCreateTime(LocalDateTime.now());
         
         userMapper.insert(user);
         
