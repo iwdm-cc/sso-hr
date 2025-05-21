@@ -5,7 +5,7 @@ import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: 'http://localhost:8000', // 设置基础URL为后端服务器地址
+  baseURL: '/api', // 使用相对路径，通过Vue代理转发请求
   timeout: 5000
 })
 
