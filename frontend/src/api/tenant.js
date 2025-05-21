@@ -20,7 +20,7 @@ export function getTenantById(id) {
 // 创建租户
 export function createTenant(data) {
   return request({
-    url: '/tenants',
+    url: '/tenant',
     method: 'post',
     data
   })
@@ -29,7 +29,7 @@ export function createTenant(data) {
 // 更新租户
 export function updateTenant(data) {
   return request({
-    url: `/tenants/${data.id}`,
+    url: `/tenant/${data.id}`,
     method: 'put',
     data
   })
@@ -38,7 +38,7 @@ export function updateTenant(data) {
 // 删除租户
 export function deleteTenant(id) {
   return request({
-    url: `/tenants/${id}`,
+    url: `/tenant/${id}`,
     method: 'delete'
   })
 }
@@ -46,7 +46,7 @@ export function deleteTenant(id) {
 // 切换租户
 export function switchTenant(tenantId) {
   return request({
-    url: `/tenants/switch/${tenantId}`,
+    url: `/tenant/switch/${tenantId}`,
     method: 'post'
   })
 }

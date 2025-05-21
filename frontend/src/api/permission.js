@@ -20,7 +20,7 @@ export function getPermissionById(id) {
 // 创建权限
 export function createPermission(data) {
   return request({
-    url: '/permissions',
+    url: '/permission',
     method: 'post',
     data
   })
@@ -29,7 +29,7 @@ export function createPermission(data) {
 // 更新权限
 export function updatePermission(data) {
   return request({
-    url: `/permissions/${data.id}`,
+    url: `/permission/${data.id}`,
     method: 'put',
     data
   })
@@ -38,7 +38,7 @@ export function updatePermission(data) {
 // 删除权限
 export function deletePermission(id) {
   return request({
-    url: `/permissions/${id}`,
+    url: `/permission/${id}`,
     method: 'delete'
   })
 }
