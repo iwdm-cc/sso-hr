@@ -11,7 +11,7 @@ module.exports = {
         }
       }
     },
-    disableHostCheck: true
+    allowedHosts: 'all'
   },
   lintOnSave: false
 }
