@@ -43,7 +43,7 @@ cors:
 
 # JWT配置
 app:
-  jwtSecret: JWTSuperSecretKey
+  jwtSecret: JWTSuperSecretKey012345678901234567890123456789012345678901234567890123456789
   jwtExpirationInMs: 86400000  # 1天
 
 # 日志配置
