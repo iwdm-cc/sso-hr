@@ -7,7 +7,7 @@ import com.saas.auth.dto.TenantDTO;
 import com.saas.auth.entity.Tenant;
 import com.saas.auth.exception.CustomException;
 import com.saas.auth.mapper.TenantMapper;
-import com.saas.auth.security.TenantContext;
+import com.saas.auth.context.TenantContext;
 import com.saas.auth.service.TenantService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +112,6 @@ public class TenantServiceImpl implements TenantService {
             throw new CustomException("租户已禁用");
         }
         
-        TenantContext.setCurrentTenant(tenantId);
+        TenantContext.setTenantId(tenantId);
     }
 }

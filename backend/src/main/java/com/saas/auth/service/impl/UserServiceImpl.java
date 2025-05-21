@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userId);
                 userRole.setRoleId(roleId);
-                userRole.setTenantId(TenantContext.getCurrentTenant());
+                userRole.setTenantId(TenantContext.getTenantId());
                 userRoleMapper.insert(userRole);
             }
         }

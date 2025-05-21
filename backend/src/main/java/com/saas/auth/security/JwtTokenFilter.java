@@ -31,7 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 // 从 JWT 中获取租户ID并设置到上下文中
                 Long tenantId = tokenProvider.getTenantIdFromToken(jwt);
-                TenantContext.setCurrentTenant(tenantId);
+                TenantContext.setTenantId(tenantId);
                 
                 // 设置身份验证
                 Authentication authentication = tokenProvider.getAuthentication(jwt);
