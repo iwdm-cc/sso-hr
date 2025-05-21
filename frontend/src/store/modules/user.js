@@ -36,6 +36,23 @@ const actions = {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
+        
+        // 直接从登录响应中获取用户和租户信息
+        const userInfo = {
+          id: data.userId,
+          username: data.username,
+          name: data.name,
+          avatar: data.avatar
+        }
+        
+        const tenantInfo = {
+          id: data.tenantId,
+          name: data.tenantName
+        }
+        
+        commit('SET_USER_INFO', userInfo)
+        commit('SET_TENANT_INFO', tenantInfo)
+        
         resolve()
       }).catch(error => {
         reject(error)
