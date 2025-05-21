@@ -34,11 +34,18 @@
         <el-button
           :loading="loading"
           type="primary"
-          style="width: 100%; margin-bottom: 30px"
+          style="width: 100%; margin-bottom: 15px"
           @click.native.prevent="handleLogin"
         >
           登录
         </el-button>
+        
+        <div class="login-tips">
+          <p>默认账号信息：</p>
+          <p>租户代码: system</p>
+          <p>用户名: test</p>
+          <p>密码: 123456</p>
+        </div>
       </el-form>
     </el-card>
   </div>
@@ -50,9 +57,9 @@ export default {
   data() {
     return {
       loginForm: {
-        tenantCode: '',
-        username: '',
-        password: ''
+        tenantCode: 'system',
+        username: 'test',
+        password: '123456'
       },
       loginRules: {
         tenantCode: [{ required: true, message: '请输入租户代码', trigger: 'blur' }],
@@ -115,5 +122,17 @@ export default {
 }
 .login-form {
   width: 100%;
+}
+.login-tips {
+  font-size: 12px;
+  background-color: #f8f8f8;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  color: #666;
+}
+.login-tips p {
+  margin: 3px 0;
 }
 </style>
