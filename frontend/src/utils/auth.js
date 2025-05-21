@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'saas_auth_token'
+const TokenKey = 'saas_token'
 
 export function getToken() {
   return Cookies.get(TokenKey)

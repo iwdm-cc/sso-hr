@@ -1,30 +1,27 @@
 <template>
   <div class="app-wrapper">
-    <Sidebar class="sidebar-container" />
+    <div class="sidebar-container">
+      <Sidebar />
+    </div>
     <div class="main-container">
-      <Header />
+      <div class="header">
+        <Header />
+      </div>
       <div class="app-main">
-        <transition name="fade-transform" mode="out-in">
-          <router-view :key="key" />
-        </transition>
+        <router-view />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { Sidebar, Header } from '@/components/layout'
+import { Sidebar, Header } from './index'
 
 export default {
   name: 'Layout',
   components: {
     Sidebar,
     Header
-  },
-  computed: {
-    key() {
-      return this.$route.path
-    }
   }
 }
 </script>
@@ -34,44 +31,35 @@ export default {
   position: relative;
   height: 100%;
   width: 100%;
+  display: flex;
 }
 
 .sidebar-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
   width: 210px;
-  overflow: hidden;
-  background: #304156;
+  height: 100%;
+  background-color: #304156;
   transition: width 0.28s;
-  z-index: 1001;
+  overflow-y: auto;
 }
 
 .main-container {
-  min-height: 100%;
-  margin-left: 210px;
-  position: relative;
-  transition: margin-left 0.28s;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #e6e6e6;
+  background: #fff;
 }
 
 .app-main {
+  flex: 1;
   padding: 20px;
-}
-
-/* fade-transform */
-.fade-transform-leave-active,
-.fade-transform-enter-active {
-  transition: all 0.5s;
-}
-
-.fade-transform-enter {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.fade-transform-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
+  overflow-y: auto;
+  background-color: #f0f2f5;
 }
 </style>

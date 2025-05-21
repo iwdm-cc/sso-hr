@@ -1,89 +1,124 @@
 <template>
-  <div class="header">
+  <div class="navbar">
+    <div class="title">
+      SaaS多租户用户权限管理系统
+    </div>
     <div class="right-menu">
-      <el-dropdown trigger="click" @command="handleTenantCommand">
-        <span class="tenant-dropdown">
-          {{ currentTenant ? currentTenant.name : '选择租户' }} <i class="el-icon-arrow-down"></i>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="tenant in tenants" :key="tenant.id" :command="tenant.id">
-            {{ tenant.name }}
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-      
       <el-dropdown trigger="click" @command="handleCommand">
-        <span class="user-dropdown">
-          {{ currentUser ? currentUser.name : 'User' }} <i class="el-icon-arrow-down"></i>
+        <span class="el-dropdown-link">
+          {{ userInfo.name || '用户' }}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="profile">个人信息</el-dropdown-item>
-          <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+          <el-dropdown-item command="switchTenant" v-if="isAdmin">切换租户</el-dropdown-item>
+          <el-dropdown-item command="userInfo">个人信息</el-dropdown-item>
+          <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    
+    <!-- 切换租户对话框 -->
+    <el-dialog title="切换租户" :visible.sync="tenantDialogVisible" width="30%">
+      <el-select v-model="selectedTenantId" placeholder="请选择租户" style="width: 100%">
+        <el-option
+          v-for="item in tenantList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+        </el-option>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="tenantDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmSwitchTenant">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { switchTenant } from '@/api/tenant'
 
 export default {
   name: 'Header',
+  data() {
+    return {
+      tenantDialogVisible: false,
+      tenantList: [],
+      selectedTenantId: null
+    }
+  },
   computed: {
     ...mapGetters([
-      'currentUser',
-      'currentTenant',
-      'tenants'
-    ])
-  },
-  created() {
-    this.$store.dispatch('tenant/getTenants')
+      'userInfo'
+    ]),
+    isAdmin() {
+      return this.userInfo.isAdmin === true
+    }
   },
   methods: {
-    async handleTenantCommand(tenantId) {
-      try {
-        await switchTenant(tenantId)
-        await this.$store.dispatch('user/getUserInfo')
-        this.$message.success('切换租户成功')
-      } catch (error) {
-        console.error(error)
-        this.$message.error('切换租户失败')
-      }
-    },
     handleCommand(command) {
       if (command === 'logout') {
-        this.$store.dispatch('user/logout').then(() => {
-          this.$router.push('/login')
-        })
-      } else if (command === 'profile') {
-        // 实现跳转到个人信息页面的逻辑
+        this.$confirm('确认退出系统?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$store.dispatch('user/logout').then(() => {
+            this.$router.push('/login')
+          })
+        }).catch(() => {})
+      } else if (command === 'switchTenant') {
+        this.getTenantList()
+        this.tenantDialogVisible = true
+      } else if (command === 'userInfo') {
+        this.$message.info('功能开发中...')
       }
+    },
+    getTenantList() {
+      this.$store.dispatch('tenant/getTenants', { page: 1, pageSize: 100 }).then(res => {
+        this.tenantList = res.list || []
+        if (this.tenantList.length > 0 && !this.selectedTenantId) {
+          this.selectedTenantId = this.tenantList[0].id
+        }
+      })
+    },
+    confirmSwitchTenant() {
+      if (!this.selectedTenantId) {
+        this.$message.warning('请选择租户')
+        return
+      }
+      
+      this.$store.dispatch('tenant/switchTenant', this.selectedTenantId).then(() => {
+        this.tenantDialogVisible = false
+        this.$message.success('切换租户成功')
+        // 重新获取用户信息
+        this.$store.dispatch('user/getUserInfo')
+      }).catch(error => {
+        console.error(error)
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.header {
+.navbar {
   height: 50px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  padding: 0 20px;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  padding: 0 15px;
+  justify-content: space-between;
 }
-
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #304156;
+}
 .right-menu {
   display: flex;
   align-items: center;
 }
-
-.user-dropdown, .tenant-dropdown {
-  color: #606266;
+.el-dropdown-link {
   cursor: pointer;
-  margin-left: 15px;
+  color: #409EFF;
 }
 </style>

@@ -1,78 +1,53 @@
 <template>
-  <div>
+  <div class="sidebar">
     <el-menu
-      :default-active="activeMenu"
-      :collapse="false"
-      :background-color="variables.menuBg"
-      :text-color="variables.menuText"
-      :active-text-color="variables.menuActiveText"
+      background-color="#304156"
+      text-color="#bfcbd9"
+      active-text-color="#409EFF"
+      :default-active="$route.path"
       router
+      unique-opened
     >
       <el-menu-item index="/dashboard">
         <i class="el-icon-s-home"></i>
-        <span slot="title">首页</span>
+        <span slot="title">仪表盘</span>
       </el-menu-item>
       
-      <el-submenu index="/user">
-        <template slot="title">
-          <i class="el-icon-user"></i>
-          <span>用户管理</span>
-        </template>
-        <el-menu-item index="/user/list">用户列表</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/user">
+        <i class="el-icon-user"></i>
+        <span slot="title">用户管理</span>
+      </el-menu-item>
       
-      <el-submenu index="/role">
-        <template slot="title">
-          <i class="el-icon-s-check"></i>
-          <span>角色管理</span>
-        </template>
-        <el-menu-item index="/role/list">角色列表</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/role">
+        <i class="el-icon-s-check"></i>
+        <span slot="title">角色管理</span>
+      </el-menu-item>
       
-      <el-submenu index="/permission">
-        <template slot="title">
-          <i class="el-icon-lock"></i>
-          <span>权限管理</span>
-        </template>
-        <el-menu-item index="/permission/list">权限列表</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/permission">
+        <i class="el-icon-key"></i>
+        <span slot="title">权限管理</span>
+      </el-menu-item>
       
-      <el-submenu index="/tenant">
-        <template slot="title">
-          <i class="el-icon-office-building"></i>
-          <span>租户管理</span>
-        </template>
-        <el-menu-item index="/tenant/list">租户列表</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/tenant">
+        <i class="el-icon-office-building"></i>
+        <span slot="title">租户管理</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Sidebar',
-  computed: {
-    activeMenu() {
-      const { meta, path } = this.$route
-      // 如果设置了高亮路径，则使用高亮路径
-      if (meta.activeMenu) {
-        return meta.activeMenu
-      }
-      return path
-    },
-    variables() {
-      return {
-        menuBg: '#304156',
-        menuText: '#bfcbd9',
-        menuActiveText: '#409EFF'
-      }
-    }
-  }
+  name: 'Sidebar'
 }
 </script>
 
 <style scoped>
+.sidebar {
+  height: 100%;
+}
 .el-menu {
   border-right: none;
+  height: 100%;
 }
 </style>
