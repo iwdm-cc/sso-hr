@@ -79,11 +79,11 @@
             <scope>runtime</scope>
         </dependency>
         
-        <!-- SpringDoc OpenAPI -->
+        <!-- Springfox Swagger -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.6</version>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
         </dependency>
         
         <!-- Sa-Token 单点登录模块 -->

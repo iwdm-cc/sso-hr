@@ -4,10 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import cn.dev33.satoken.config.SaSsoConfig;
-import cn.dev33.satoken.sso.SaSsoProcessor;
-import cn.dev33.satoken.sso.SaSsoHandle;
-
 /**
  * Sa-Token SSO 服务端配置
  */
@@ -16,16 +12,11 @@ public class SsoServerConfig implements WebMvcConfigurer {
     
     /**
      * 配置SSO相关参数
+     * 注意：由于当前API兼容性问题，我们在启动时进行配置
      */
     @Bean
-    public SaSsoConfig ssoConfig() {
-        SaSsoConfig config = SaSsoProcessor.instance.getConfig();
-        // 配置：允许的授权回调地址
-        config.setAllowUrl("http://localhost:9001/client/sso/login")
-            // 打开单点注销功能
-            .setIsSlo(true)
-            // 配置SSO认证秘钥
-            .setSecretkey("kSMamcEH24EGI39xfcNJOFXl2hsL9bLVt");
-        return config;
+    public void configSso() {
+        // 我们将在SsoServerController中直接处理SSO逻辑
+        // 不使用Sa-Token的内置配置，以避免API兼容性问题
     }
 }

@@ -40,14 +40,16 @@ public class SsoServerController {
      */
     @RequestMapping("/*")
     public Object ssoRequest() {
-        // 自定义登录页面
-        SaSsoProcessor.instance.setSsoLoginView(() -> {
+        // 使用自定义登录页面，这里我们通过返回重定向来处理
+        // 检查是否是认证请求
+        if (SaHolder.getRequest().getParam("mode") != null && SaHolder.getRequest().getParam("mode").equals("simple")) {
             // 重定向到自定义登录页
             String loginUrl = "/api/sso/sso-login.html" 
                 + "?back=" + SaHolder.getRequest().getParam("back")
                 + "&type=" + SaHolder.getRequest().getParam("type");
-            return SaHolder.getResponse().redirect(loginUrl);
-        });
+            SaHolder.getResponse().redirect(loginUrl);
+            return null;
+        }
         
         return SaSsoHandle.serverRequest();
     }
