@@ -21,8 +21,9 @@ const actions = {
       // 从后端数据库获取真实数据
       getRoles(query).then(response => {
         const { data } = response
-        commit('SET_ROLE_LIST', data.list)
-        commit('SET_TOTAL', data.total)
+        console.log("角色列表响应:", response)
+        commit('SET_ROLE_LIST', data.list || [])
+        commit('SET_TOTAL', data.total || 0)
         resolve(data)
       }).catch(error => {
         console.error('获取角色列表失败:', error)

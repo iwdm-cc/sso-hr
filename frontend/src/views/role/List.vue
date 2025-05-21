@@ -158,8 +158,12 @@ export default {
     getList() {
       this.listLoading = true
       this.$store.dispatch('role/getRoles', this.listQuery).then(data => {
-        this.list = data.list
-        this.total = data.total
+        console.log('角色列表数据:', data)
+        this.list = data.list || []
+        this.total = data.total || 0
+        this.listLoading = false
+      }).catch(error => {
+        console.error('加载角色列表失败:', error)
         this.listLoading = false
       })
     },
