@@ -97,45 +97,64 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 用户角色关系
 INSERT INTO sys_user_role (user_id, role_id, tenant_id, create_time) 
-VALUES (1, 1, 1, CURRENT_TIMESTAMP);
+VALUES (1, 1, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (user_id, role_id, tenant_id) DO NOTHING;
 INSERT INTO sys_user_role (user_id, role_id, tenant_id, create_time) 
-VALUES (2, 3, 2, CURRENT_TIMESTAMP);
+VALUES (2, 3, 2, CURRENT_TIMESTAMP)
+ON CONFLICT (user_id, role_id, tenant_id) DO NOTHING;
 
 -- 角色权限关系 (超级管理员拥有所有权限)
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 1, 1, CURRENT_TIMESTAMP);
+VALUES (1, 1, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 2, 1, CURRENT_TIMESTAMP);
+VALUES (1, 2, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 3, 1, CURRENT_TIMESTAMP);
+VALUES (1, 3, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 4, 1, CURRENT_TIMESTAMP);
+VALUES (1, 4, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 5, 1, CURRENT_TIMESTAMP);
+VALUES (1, 5, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 6, 1, CURRENT_TIMESTAMP);
+VALUES (1, 6, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 7, 1, CURRENT_TIMESTAMP);
+VALUES (1, 7, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 8, 1, CURRENT_TIMESTAMP);
+VALUES (1, 8, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 9, 1, CURRENT_TIMESTAMP);
+VALUES (1, 9, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 10, 1, CURRENT_TIMESTAMP);
+VALUES (1, 10, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 11, 1, CURRENT_TIMESTAMP);
+VALUES (1, 11, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 12, 1, CURRENT_TIMESTAMP);
+VALUES (1, 12, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 13, 1, CURRENT_TIMESTAMP);
+VALUES (1, 13, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 14, 1, CURRENT_TIMESTAMP);
+VALUES (1, 14, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 15, 1, CURRENT_TIMESTAMP);
+VALUES (1, 15, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 16, 1, CURRENT_TIMESTAMP);
+VALUES (1, 16, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
-VALUES (1, 17, 1, CURRENT_TIMESTAMP);
+VALUES (1, 17, 1, CURRENT_TIMESTAMP)
+ON CONFLICT (role_id, permission_id, tenant_id) DO NOTHING;
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
 VALUES (1, 18, 1, CURRENT_TIMESTAMP);
 INSERT INTO sys_role_permission (role_id, permission_id, tenant_id, create_time) 
