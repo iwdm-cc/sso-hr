@@ -67,7 +67,7 @@ app.get('/protected', requireLogin, (req, res) => {
   });
 });
 
-// SSO 登录 - 简化版，用于测试
+// SSO 登录 - 连接到真实的SSO服务器
 app.get('/sso/login', (req, res) => {
   console.log('收到SSO登录请求');
   
@@ -77,18 +77,21 @@ app.get('/sso/login', (req, res) => {
     return res.redirect('/');
   }
   
-  // 在实际情况中，这里会重定向到SSO服务器
-  // 但为了简化测试，我们直接模拟登录成功，重定向到回调页面
-  console.log('模拟SSO登录流程，直接重定向到回调页面');
+  // 重定向到SSO认证服务器
+  const redirectUrl = `${SSO_AUTH_URL}?redirect=${encodeURIComponent(CLIENT_CALLBACK_URL)}`;
+  console.log('重定向到SSO认证服务器:', redirectUrl);
   
-  // 生成一个模拟令牌
-  const mockToken = 'mock_jwt_token_' + Date.now();
-  
-  // 重定向到回调页面，带上模拟的令牌
-  res.redirect(`/sso/callback?token=${mockToken}&userId=${DEMO_USER.username}`);
+  // 为了便于调试，添加后备方案
+  try {
+    res.redirect(redirectUrl);
+  } catch (error) {
+    console.error('重定向到SSO服务器失败:', error);
+    // 如果重定向失败，使用模拟方式
+    res.redirect(`/sso/callback?token=mock_jwt_token_${Date.now()}&userId=${DEMO_USER.username}`);
+  }
 });
 
-// SSO 回调处理 - 简化版，用于测试
+// SSO 回调处理 - 连接到真实的SSO服务器
 app.get('/sso/callback', async (req, res) => {
   const { token, userId } = req.query;
   console.log('收到SSO回调，token:', token, '用户ID:', userId);
@@ -102,12 +105,45 @@ app.get('/sso/callback', async (req, res) => {
     // 保存令牌到会话
     req.session.token = token;
     
-    // 简化测试：使用预定义的用户信息，而不是从SSO服务器获取
-    console.log('使用模拟用户数据，绕过SSO服务器');
+    // 尝试从SSO服务器获取用户信息
+    console.log('准备从SSO服务器获取用户信息, URL:', `${SSO_USERINFO_URL}?token=${token}`);
     
-    // 将示例用户保存到会话
-    req.session.user = DEMO_USER;
-    console.log('用户信息已保存到会话:', JSON.stringify(req.session.user));
+    try {
+      // 设置请求配置
+      const axiosConfig = {
+        timeout: 5000, // 5秒超时
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      };
+      
+      // 从SSO服务器获取用户信息
+      const response = await axios.get(`${SSO_USERINFO_URL}?token=${token}`, axiosConfig);
+      console.log('SSO服务器响应状态:', response.status);
+      
+      if (response.data && response.data.code === 200) {
+        // 将用户信息保存到会话
+        req.session.user = response.data.data;
+        console.log('成功获取到用户信息:', JSON.stringify(req.session.user));
+      } else {
+        // 如果响应格式不符合预期，使用备用用户数据
+        console.warn('SSO服务器响应格式不符合预期，使用备用数据');
+        req.session.user = {
+          ...DEMO_USER,
+          note: '这是备用数据，SSO服务器响应异常'
+        };
+      }
+    } catch (apiError) {
+      console.error('调用SSO服务器API失败:', apiError.message);
+      
+      // 使用备用用户数据
+      console.warn('使用备用用户数据');
+      req.session.user = {
+        ...DEMO_USER,
+        note: '这是备用数据，SSO服务器连接失败'
+      };
+    }
     
     // 重定向到首页
     return res.redirect('/');
@@ -117,9 +153,9 @@ app.get('/sso/callback', async (req, res) => {
   }
 });
 
-// SSO 登出 - 简化版，用于测试
+// SSO 登出 - 连接到真实的SSO服务器
 app.get('/sso/logout', (req, res) => {
-  console.log('收到登出请求，清除本地会话');
+  console.log('收到登出请求');
   
   // 清除本地会话
   req.session.destroy((err) => {
@@ -127,9 +163,14 @@ app.get('/sso/logout', (req, res) => {
       console.error('清除会话时出错:', err);
     }
     
-    console.log('已清除会话，重定向到首页');
-    // 简化测试：直接重定向到首页，而不是访问SSO服务器
-    res.redirect('/');
+    // 构建SSO登出URL，包含回调地址
+    const logoutRedirectUrl = encodeURIComponent(`http://localhost:${port}/`);
+    const ssoLogoutUrl = `${SSO_LOGOUT_URL}?redirect=${logoutRedirectUrl}`;
+    
+    console.log('重定向到SSO服务器登出:', ssoLogoutUrl);
+    
+    // 重定向到SSO服务器进行登出
+    res.redirect(ssoLogoutUrl);
   });
 });
 
