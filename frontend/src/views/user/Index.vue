@@ -110,8 +110,8 @@ export default {
   },
   computed: {
     ...mapState({
-      users: state => state.user.users,
-      total: state => state.user.total
+      users: state => state.user.userList || [],
+      total: state => state.user.total || 0
     })
   },
   created() {

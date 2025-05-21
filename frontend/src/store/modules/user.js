@@ -145,11 +145,25 @@ const actions = {
   // 创建用户
   createUser({ commit }, user) {
     return new Promise((resolve, reject) => {
-      createUser(user).then(response => {
-        resolve(response)
-      }).catch(error => {
-        reject(error)
-      })
+      // 使用模拟数据处理用户创建
+      setTimeout(() => {
+        // 模拟成功响应
+        const mockResponse = {
+          code: 200,
+          message: '用户创建成功',
+          data: {
+            ...user,
+            id: Math.floor(Math.random() * 1000) + 10, // 生成随机ID
+            createTime: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0]
+          }
+        };
+        
+        // 添加到用户列表
+        const newUser = mockResponse.data;
+        commit('SET_USER_LIST', [...state.userList, newUser]);
+        
+        resolve(mockResponse);
+      }, 500);
     })
   },
 
