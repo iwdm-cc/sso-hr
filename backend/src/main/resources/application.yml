@@ -1,0 +1,50 @@
+# 服务器配置
+server:
+  port: 8000
+  servlet:
+    context-path: /api
+
+# Spring配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/saas_auth?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.saas.auth.entity
+  global-config:
+    db-config:
+      id-type: auto
+      table-prefix: sys_
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 跨域配置
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "Authorization"
+
+# JWT配置
+app:
+  jwtSecret: JWTSuperSecretKey
+  jwtExpirationInMs: 86400000  # 1天
+
+# 日志配置
+logging:
+  level:
+    com.saas.auth: debug
+    org.springframework.security: debug
