@@ -96,13 +96,25 @@ export default {
   methods: {
     login() {
       this.loading = true
+      // 使用模拟数据展示界面功能
       setTimeout(() => {
         // 模拟登录成功
         this.token = 'mock-token'
-        this.userInfo = { name: '测试用户', username: 'admin' }
-        this.tenantInfo = { name: '测试租户', code: 'test' }
+        this.userInfo = { 
+          name: this.loginForm.username || '测试用户', 
+          username: this.loginForm.username || 'admin',
+          id: 1,
+          email: 'admin@example.com',
+          status: 1
+        }
+        this.tenantInfo = { 
+          name: '租户-' + this.loginForm.tenantCode, 
+          code: this.loginForm.tenantCode || 'test',
+          id: 1,
+          status: 1
+        }
         this.loading = false
-      }, 1000)
+      }, 800)
     },
     logout() {
       this.token = ''
