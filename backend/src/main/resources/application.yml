@@ -8,7 +8,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL}
+    url: jdbc:postgresql://ep-withered-fog-a5tv9dme.us-east-2.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_lsIFM6uGOx3N
     schema: classpath:schema.sql
     data: classpath:data.sql
     initialization-mode: always
