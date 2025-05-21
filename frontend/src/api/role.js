@@ -20,7 +20,7 @@ export function getRoleById(id) {
 // 创建角色
 export function createRole(data) {
   return request({
-    url: '/roles',
+    url: '/role',
     method: 'post',
     data
   })
@@ -29,7 +29,7 @@ export function createRole(data) {
 // 更新角色
 export function updateRole(data) {
   return request({
-    url: `/roles/${data.id}`,
+    url: `/role/${data.id}`,
     method: 'put',
     data
   })
@@ -38,7 +38,7 @@ export function updateRole(data) {
 // 删除角色
 export function deleteRole(id) {
   return request({
-    url: `/roles/${id}`,
+    url: `/role/${id}`,
     method: 'delete'
   })
 }
@@ -46,7 +46,7 @@ export function deleteRole(id) {
 // 分配权限
 export function assignPermissions(roleId, permissionIds) {
   return request({
-    url: `/roles/${roleId}/permissions`,
+    url: `/role/${roleId}/permissions`,
     method: 'post',
     data: { permissionIds }
   })
@@ -55,7 +55,7 @@ export function assignPermissions(roleId, permissionIds) {
 // 获取角色权限
 export function getRolePermissions(roleId) {
   return request({
-    url: `/roles/${roleId}/permissions`,
+    url: `/role/${roleId}/permissions`,
     method: 'get'
   })
 }

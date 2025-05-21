@@ -37,7 +37,7 @@ export function getUsers(params) {
 // 获取指定用户
 export function getUserById(id) {
   return request({
-    url: `/users/${id}`,
+    url: `/user/${id}`,
     method: 'get'
   })
 }
@@ -45,7 +45,7 @@ export function getUserById(id) {
 // 创建用户
 export function createUser(data) {
   return request({
-    url: '/users',
+    url: '/user',
     method: 'post',
     data
   })
@@ -54,7 +54,7 @@ export function createUser(data) {
 // 更新用户
 export function updateUser(data) {
   return request({
-    url: `/users/${data.id}`,
+    url: `/user/${data.id}`,
     method: 'put',
     data
   })
@@ -63,7 +63,7 @@ export function updateUser(data) {
 // 删除用户
 export function deleteUser(id) {
   return request({
-    url: `/users/${id}`,
+    url: `/user/${id}`,
     method: 'delete'
   })
 }
@@ -71,7 +71,7 @@ export function deleteUser(id) {
 // 分配角色
 export function assignRoles(userId, roleIds) {
   return request({
-    url: `/users/${userId}/roles`,
+    url: `/user/${userId}/roles`,
     method: 'post',
     data: { roleIds }
   })
