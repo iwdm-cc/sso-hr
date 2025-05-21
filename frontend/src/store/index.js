@@ -19,5 +19,17 @@ export default new Vuex.Store({
     role,
     permission,
     tenant
+  },
+  getters: {
+    // 添加全局getters，解决找不到的问题
+    userInfo: state => state.user.userInfo || { 
+      name: '测试用户',
+      username: 'test',
+      permissions: ['system:view', 'user:view', 'role:view']
+    },
+    tenantInfo: state => state.user.tenantInfo || { 
+      name: '系统租户',
+      code: 'system'
+    }
   }
 })

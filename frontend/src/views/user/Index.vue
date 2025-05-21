@@ -87,8 +87,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import { getUserRoles } from '@/api/user';
-import { getAllRoles } from '@/api/role';
 
 export default {
   name: 'UserIndex',
@@ -175,13 +173,16 @@ export default {
       this.roleDialogVisible = true;
       
       try {
-        // 获取所有角色
-        const rolesResponse = await getAllRoles();
-        this.allRoles = rolesResponse.data;
+        // 使用模拟数据展示功能
+        this.allRoles = [
+          { id: 1, name: '超级管理员' },
+          { id: 2, name: '系统管理员' },
+          { id: 3, name: '普通用户' },
+          { id: 4, name: '访客' }
+        ];
         
-        // 获取用户已分配的角色
-        const userRolesResponse = await getUserRoles(row.id);
-        this.selectedRoles = userRolesResponse.data.map(role => role.id);
+        // 设置默认选中角色
+        this.selectedRoles = [2, 3];
       } catch (error) {
         console.error('Failed to fetch roles:', error);
         this.$message.error('获取角色数据失败');

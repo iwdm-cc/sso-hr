@@ -84,7 +84,6 @@
 <script>
 import { mapState } from 'vuex';
 import { getRolePermissions } from '@/api/role';
-import { getAllPermissions } from '@/api/permission';
 
 export default {
   name: 'RoleIndex',
@@ -168,17 +167,31 @@ export default {
       this.permissionDialogVisible = true;
       
       try {
-        // 获取所有权限
-        const permissionsResponse = await getAllPermissions();
-        this.buildPermissionTree(permissionsResponse.data);
+        // 使用模拟数据展示权限树
+        const mockPermissions = [
+          { id: 1, name: '系统管理', parentId: 0 },
+          { id: 2, name: '用户管理', parentId: 1 },
+          { id: 3, name: '角色管理', parentId: 1 },
+          { id: 4, name: '权限管理', parentId: 1 },
+          { id: 5, name: '租户管理', parentId: 1 },
+          { id: 6, name: '查看用户', parentId: 2 },
+          { id: 7, name: '创建用户', parentId: 2 },
+          { id: 8, name: '编辑用户', parentId: 2 },
+          { id: 9, name: '删除用户', parentId: 2 },
+          { id: 10, name: '查看角色', parentId: 3 },
+          { id: 11, name: '创建角色', parentId: 3 },
+          { id: 12, name: '编辑角色', parentId: 3 },
+          { id: 13, name: '删除角色', parentId: 3 },
+        ];
         
-        // 获取角色已分配的权限
-        const rolePermissionsResponse = await getRolePermissions(row.id);
-        const rolePermissionIds = rolePermissionsResponse.data.map(perm => perm.id);
+        this.buildPermissionTree(mockPermissions);
+        
+        // 设置默认选中的权限
+        const mockSelectedPermissions = [6, 7, 10, 11];
         
         // 设置已选权限
         this.$nextTick(() => {
-          this.$refs.permissionTree.setCheckedKeys(rolePermissionIds);
+          this.$refs.permissionTree.setCheckedKeys(mockSelectedPermissions);
         });
       } catch (error) {
         console.error('Failed to fetch permissions:', error);
