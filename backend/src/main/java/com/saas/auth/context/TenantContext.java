@@ -19,9 +19,15 @@ public class TenantContext {
     
     /**
      * 获取当前租户ID
+     * 开发环境下，如果未设置租户ID，默认返回系统管理租户ID 1
      */
     public static Long getTenantId() {
-        return CURRENT_TENANT.get();
+        Long tenantId = CURRENT_TENANT.get();
+        // 开发环境下，如果租户ID为空，默认使用ID为1的系统管理租户
+        if (tenantId == null) {
+            return 1L;
+        }
+        return tenantId;
     }
     
     /**
