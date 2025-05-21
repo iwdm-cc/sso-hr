@@ -1,12 +1,16 @@
 import { getPermissions, getPermissionById, createPermission, updatePermission, deletePermission } from '@/api/permission'
 
 const state = {
-  permissions: []
+  permissionList: [],
+  total: 0
 }
 
 const mutations = {
-  SET_PERMISSIONS: (state, permissions) => {
-    state.permissions = permissions
+  SET_PERMISSION_LIST: (state, list) => {
+    state.permissionList = list
+  },
+  SET_TOTAL: (state, total) => {
+    state.total = total
   }
 }
 
@@ -16,7 +20,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       getPermissions(query).then(response => {
         const { data } = response
-        commit('SET_PERMISSIONS', data)
+        commit('SET_PERMISSION_LIST', data.list)
+        commit('SET_TOTAL', data.total)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -24,7 +29,7 @@ const actions = {
     })
   },
 
-  // 获取单个权限
+  // 根据ID获取权限信息
   getPermissionById({ commit }, id) {
     return new Promise((resolve, reject) => {
       getPermissionById(id).then(response => {
@@ -70,9 +75,15 @@ const actions = {
   }
 }
 
+const getters = {
+  permissionList: state => state.permissionList,
+  total: state => state.total
+}
+
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

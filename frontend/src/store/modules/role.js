@@ -1,12 +1,16 @@
-import { getRoles, getRoleById, createRole, updateRole, deleteRole, assignPermissions } from '@/api/role'
+import { getRoles, getRoleById, createRole, updateRole, deleteRole, assignPermissions, getRolePermissions } from '@/api/role'
 
 const state = {
-  roles: []
+  roleList: [],
+  total: 0
 }
 
 const mutations = {
-  SET_ROLES: (state, roles) => {
-    state.roles = roles
+  SET_ROLE_LIST: (state, list) => {
+    state.roleList = list
+  },
+  SET_TOTAL: (state, total) => {
+    state.total = total
   }
 }
 
@@ -16,7 +20,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       getRoles(query).then(response => {
         const { data } = response
-        commit('SET_ROLES', data)
+        commit('SET_ROLE_LIST', data.list)
+        commit('SET_TOTAL', data.total)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -24,7 +29,7 @@ const actions = {
     })
   },
 
-  // 获取单个角色
+  // 根据ID获取角色信息
   getRoleById({ commit }, id) {
     return new Promise((resolve, reject) => {
       getRoleById(id).then(response => {
@@ -78,12 +83,30 @@ const actions = {
         reject(error)
       })
     })
+  },
+
+  // 获取角色权限
+  getRolePermissions({ commit }, roleId) {
+    return new Promise((resolve, reject) => {
+      getRolePermissions(roleId).then(response => {
+        const { data } = response
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
+}
+
+const getters = {
+  roleList: state => state.roleList,
+  total: state => state.total
 }
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

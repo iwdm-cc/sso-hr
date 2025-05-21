@@ -1,12 +1,16 @@
-import { getTenants, getTenantById, createTenant, updateTenant, deleteTenant } from '@/api/tenant'
+import { getTenants, getTenantById, createTenant, updateTenant, deleteTenant, switchTenant } from '@/api/tenant'
 
 const state = {
-  tenants: []
+  tenantList: [],
+  total: 0
 }
 
 const mutations = {
-  SET_TENANTS: (state, tenants) => {
-    state.tenants = tenants
+  SET_TENANT_LIST: (state, list) => {
+    state.tenantList = list
+  },
+  SET_TOTAL: (state, total) => {
+    state.total = total
   }
 }
 
@@ -16,7 +20,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       getTenants(query).then(response => {
         const { data } = response
-        commit('SET_TENANTS', data)
+        commit('SET_TENANT_LIST', data.list)
+        commit('SET_TOTAL', data.total)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -24,7 +29,7 @@ const actions = {
     })
   },
 
-  // 获取单个租户
+  // 根据ID获取租户信息
   getTenantById({ commit }, id) {
     return new Promise((resolve, reject) => {
       getTenantById(id).then(response => {
@@ -67,12 +72,29 @@ const actions = {
         reject(error)
       })
     })
+  },
+
+  // 切换租户
+  switchTenant({ commit }, tenantId) {
+    return new Promise((resolve, reject) => {
+      switchTenant(tenantId).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
+}
+
+const getters = {
+  tenantList: state => state.tenantList,
+  total: state => state.total
 }
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

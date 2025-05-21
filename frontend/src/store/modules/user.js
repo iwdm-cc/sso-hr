@@ -1,37 +1,38 @@
 import { login, logout, getUserInfo, getUsers, getUserById, createUser, updateUser, deleteUser, assignRoles } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import router from '@/router'
 
 const state = {
   token: getToken(),
-  currentUser: null,
-  currentTenant: null,
-  permissions: [],
-  users: []
+  userInfo: {},
+  tenantInfo: {},
+  userList: [],
+  total: 0
 }
 
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_CURRENT_USER: (state, user) => {
-    state.currentUser = user
+  SET_USER_INFO: (state, userInfo) => {
+    state.userInfo = userInfo
   },
-  SET_CURRENT_TENANT: (state, tenant) => {
-    state.currentTenant = tenant
+  SET_TENANT_INFO: (state, tenantInfo) => {
+    state.tenantInfo = tenantInfo
   },
-  SET_PERMISSIONS: (state, permissions) => {
-    state.permissions = permissions
+  SET_USER_LIST: (state, list) => {
+    state.userList = list
   },
-  SET_USERS: (state, users) => {
-    state.users = users
+  SET_TOTAL: (state, total) => {
+    state.total = total
   }
 }
 
 const actions = {
-  // 登录
-  login({ commit }, loginInfo) {
+  // 用户登录
+  login({ commit }, loginData) {
     return new Promise((resolve, reject) => {
-      login(loginInfo).then(response => {
+      login(loginData).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -51,10 +52,8 @@ const actions = {
           reject('验证失败，请重新登录')
         }
         
-        const { user, tenant, permissions } = data
-        commit('SET_CURRENT_USER', user)
-        commit('SET_CURRENT_TENANT', tenant)
-        commit('SET_PERMISSIONS', permissions)
+        commit('SET_USER_INFO', data.user)
+        commit('SET_TENANT_INFO', data.tenant)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -67,10 +66,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       logout().then(() => {
         commit('SET_TOKEN', '')
-        commit('SET_CURRENT_USER', null)
-        commit('SET_CURRENT_TENANT', null)
-        commit('SET_PERMISSIONS', [])
+        commit('SET_USER_INFO', {})
+        commit('SET_TENANT_INFO', {})
         removeToken()
+        router.push('/login')
         resolve()
       }).catch(error => {
         reject(error)
@@ -83,7 +82,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       getUsers(query).then(response => {
         const { data } = response
-        commit('SET_USERS', data)
+        commit('SET_USER_LIST', data.list)
+        commit('SET_TOTAL', data.total)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -91,7 +91,7 @@ const actions = {
     })
   },
 
-  // 获取单个用户
+  // 根据ID获取用户信息
   getUserById({ commit }, id) {
     return new Promise((resolve, reject) => {
       getUserById(id).then(response => {
@@ -148,9 +148,18 @@ const actions = {
   }
 }
 
+const getters = {
+  token: state => state.token,
+  userInfo: state => state.userInfo,
+  tenantInfo: state => state.tenantInfo,
+  userList: state => state.userList,
+  total: state => state.total
+}
+
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 }
