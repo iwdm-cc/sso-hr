@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 租户拦截器，用于从请求头中提取租户ID
+ * 租户头部拦截器，用于从请求头中提取租户ID
  */
-@Component
+@Component("headerTenantInterceptor")
 public class TenantInterceptor implements HandlerInterceptor {
 
     private static final String TENANT_HEADER = "X-Tenant-ID";

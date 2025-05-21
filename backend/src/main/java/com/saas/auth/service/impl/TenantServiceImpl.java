@@ -31,7 +31,8 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Map<String, Object> getTenantList(int page, int pageSize, String keyword, Boolean status) {
         Page<Tenant> pageParam = new Page<>(page, pageSize);
-        IPage<Tenant> pageResult = tenantMapper.selectTenantPage(pageParam, keyword, status);
+        Integer statusValue = (status != null) ? (status ? 1 : 0) : null;
+        IPage<Tenant> pageResult = tenantMapper.selectTenantPage(pageParam, keyword, statusValue);
         
         List<TenantDTO> tenantDTOs = pageResult.getRecords().stream().map(tenant -> {
             TenantDTO tenantDTO = new TenantDTO();
@@ -107,7 +108,7 @@ public class TenantServiceImpl implements TenantService {
             throw new CustomException("租户不存在");
         }
         
-        if (!tenant.getStatus()) {
+        if (tenant.getStatus() != 1) {
             throw new CustomException("租户已禁用");
         }
         

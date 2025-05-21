@@ -11,12 +11,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
-    private TenantInterceptor tenantInterceptor;
+    private com.saas.auth.interceptor.TenantInterceptor jwtTenantInterceptor;
+    
+    @Autowired
+    private com.saas.auth.config.TenantInterceptor headerTenantInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 添加租户拦截器，除了登录接口外的所有接口都需要处理租户信息
-        registry.addInterceptor(tenantInterceptor)
+        // 添加JWT租户拦截器，从JWT令牌中提取租户ID
+        registry.addInterceptor(jwtTenantInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/auth/login", "/auth/register", "/h2-console/**");
+        
+        // 添加请求头租户拦截器，从请求头中提取租户ID
+        registry.addInterceptor(headerTenantInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/auth/login", "/auth/register", "/h2-console/**");
     }
