@@ -5,7 +5,7 @@ import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '', // 移除baseURL前缀，因为后端路径已包含/api
+  baseURL: '', // 不设置基础URL，直接使用完整路径
   timeout: 5000
 })
 

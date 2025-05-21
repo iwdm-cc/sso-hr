@@ -28,7 +28,7 @@ export function getUserInfo() {
 // 获取用户列表
 export function getUsers(params) {
   return request({
-    url: '/user/list',
+    url: '/api/user/list',
     method: 'get',
     params
   })

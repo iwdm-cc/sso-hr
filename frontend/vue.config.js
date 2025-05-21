@@ -6,9 +6,8 @@ module.exports = {
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        pathRewrite: {
-          '^/api': '/api'
-        }
+        // 不重写路径，因为后端已有/api前缀
+        pathRewrite: null
       }
     },
     allowedHosts: 'all'
