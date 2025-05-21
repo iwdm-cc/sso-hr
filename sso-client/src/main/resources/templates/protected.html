@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>受保护的资源 - SSO客户端应用</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f0f8ff; /* 浅蓝色背景以区别于首页 */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .info-panel {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+            display: inline-block;
+            min-width: 100px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .token-box {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>受保护的资源页面</h1>
+        <div class="info-panel">
+            <h2>用户信息</h2>
+            <p><span class="label">用户ID：</span><span th:text="${userId}"></span></p>
+            <p><span class="label">Token：</span></p>
+            <div class="token-box" th:text="${token}"></div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>系统功能</h2>
+            <p>这是一个需要登录才能访问的受保护资源，您已成功通过单点登录系统验证身份。</p>
+            <p>在实际应用中，这里可以展示各种业务数据和功能。</p>
+        </div>
+        
+        <div>
+            <a href="/client/" class="btn">返回首页</a>
+            <a href="/client/sso/logout" class="btn">退出登录</a>
+        </div>
+    </div>
+</body>
+</html>

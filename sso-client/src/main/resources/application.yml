@@ -1,0 +1,36 @@
+server:
+  port: 9001
+  servlet:
+    context-path: /client
+
+spring:
+  application:
+    name: sso-client-demo
+
+# Sa-Token配置
+sa-token:
+  # SSO-相关配置
+  sso:
+    # SSO-Server端 统一认证地址
+    auth-url: http://localhost:8000/api/sso/auth
+    # 是否打开单点注销接口
+    is-slo: true
+    # SSO-Server端 单点注销地址
+    slo-url: http://localhost:8000/api/sso/logout
+    # 接口调用秘钥
+    secretkey: kSMamcEH24EGI39xfcNJOFXl2hsL9bLVt
+
+  # token名称 (同时也是cookie名称)
+  token-name: satoken
+  # token有效期，单位秒，默认12小时
+  timeout: 43200
+  # token临时有效期 (指定时间内无操作就过期)，单位: 秒
+  active-timeout: -1
+  # 是否允许同一账号并发登录
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token
+  is-share: false
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
