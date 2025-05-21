@@ -109,6 +109,42 @@
         <el-button type="primary" @click="confirmAssignRole">确定</el-button>
       </div>
     </el-dialog>
+    
+    <!-- 创建/编辑用户对话框 -->
+    <el-dialog :title="dialogTitle" :visible.sync="userDialogVisible" width="40%">
+      <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px" class="user-form">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="userForm.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="密码" prop="password" v-if="isCreate">
+          <el-input v-model="userForm.password" type="password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="userForm.name" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userForm.email" placeholder="请输入邮箱"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="电话" prop="phone">
+          <el-input v-model="userForm.phone" placeholder="请输入电话"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="userForm.status">
+            <el-radio :label="1">启用</el-radio>
+            <el-radio :label="0">禁用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="userDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitUserForm" :loading="submitting">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -148,7 +184,37 @@ export default {
       roleDialogVisible: false,
       currentUserId: null,
       selectedRoles: [],
-      roleOptions: []
+      roleOptions: [],
+      // 用户表单相关
+      userDialogVisible: false,
+      isCreate: true,
+      dialogTitle: '创建用户',
+      submitting: false,
+      userForm: {
+        id: undefined,
+        username: '',
+        password: '',
+        name: '',
+        email: '',
+        phone: '',
+        status: 1
+      },
+      userRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' }
+        ],
+        email: [
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+        ]
+      }
     }
   },
   computed: {
@@ -163,10 +229,34 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      this.$store.dispatch('user/getUsers', this.listQuery).then(data => {
-        this.list = data.list
-        this.total = data.total
+      const params = {
+        username: this.listQuery.keyword,
+        name: this.listQuery.keyword,
+        status: this.listQuery.status,
+        current: this.listQuery.page,
+        size: this.listQuery.pageSize
+      }
+      this.$store.dispatch('user/getUsers', params).then(data => {
+        console.log('用户列表数据:', data)
+        // 确保从后端返回的数据正确绑定到视图
+        if (data && data.list) {
+          // 处理status值，确保是布尔类型
+          this.list = data.list.map(item => {
+            return {
+              ...item,
+              status: item.status === 1 || item.status === true
+            }
+          })
+          this.total = data.total || 0
+        } else {
+          this.list = []
+          this.total = 0
+        }
         this.listLoading = false
+      }).catch(error => {
+        console.error('加载用户列表失败:', error)
+        this.listLoading = false
+        this.$message.error('加载用户列表失败')
       })
     },
     handleFilter() {
@@ -174,10 +264,64 @@ export default {
       this.getList()
     },
     handleCreate() {
-      this.$router.push('/user/edit')
+      this.isCreate = true
+      this.dialogTitle = '创建用户'
+      this.userForm = {
+        id: undefined,
+        username: '',
+        password: '',
+        name: '',
+        email: '',
+        phone: '',
+        status: 1
+      }
+      this.userDialogVisible = true
+      // 在弹窗打开后重置表单验证
+      this.$nextTick(() => {
+        if (this.$refs.userForm) {
+          this.$refs.userForm.clearValidate()
+        }
+      })
     },
     handleUpdate(row) {
-      this.$router.push(`/user/edit/${row.id}`)
+      this.isCreate = false
+      this.dialogTitle = '编辑用户'
+      // 获取用户详情
+      this.$store.dispatch('user/getUserById', row.id).then(user => {
+        this.userForm = { ...user, password: '' }  // 不回显密码
+        this.userDialogVisible = true
+        // 在弹窗打开后重置表单验证
+        this.$nextTick(() => {
+          if (this.$refs.userForm) {
+            this.$refs.userForm.clearValidate()
+          }
+        })
+      }).catch(error => {
+        console.error('获取用户详情失败:', error)
+        this.$message.error('获取用户详情失败')
+      })
+    },
+    submitUserForm() {
+      this.$refs.userForm.validate(valid => {
+        if (valid) {
+          this.submitting = true
+          const action = this.isCreate ? 'user/createUser' : 'user/updateUser'
+          
+          this.$store.dispatch(action, this.userForm)
+            .then(() => {
+              this.$message.success(this.isCreate ? '用户创建成功' : '用户编辑成功')
+              this.userDialogVisible = false
+              this.getList() // 刷新列表
+            })
+            .catch(error => {
+              console.error(this.isCreate ? '创建用户失败:' : '编辑用户失败:', error)
+              this.$message.error(this.isCreate ? '创建用户失败' : '编辑用户失败')
+            })
+            .finally(() => {
+              this.submitting = false
+            })
+        }
+      })
     },
     handleDelete(row) {
       this.$confirm('确认删除该用户?', '警告', {

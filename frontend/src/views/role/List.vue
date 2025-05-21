@@ -157,14 +157,33 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      this.$store.dispatch('role/getRoles', this.listQuery).then(data => {
+      const params = {
+        name: this.listQuery.keyword,
+        status: this.listQuery.status,
+        current: this.listQuery.page,
+        size: this.listQuery.pageSize
+      }
+      this.$store.dispatch('role/getRoles', params).then(data => {
         console.log('角色列表数据:', data)
-        this.list = data.list || []
-        this.total = data.total || 0
+        // 确保从后端返回的数据正确绑定到视图
+        if (data && data.list) {
+          // 处理status值，确保是布尔类型
+          this.list = data.list.map(item => {
+            return {
+              ...item,
+              status: item.status === 1 || item.status === true
+            }
+          })
+          this.total = data.total || 0
+        } else {
+          this.list = []
+          this.total = 0
+        }
         this.listLoading = false
       }).catch(error => {
         console.error('加载角色列表失败:', error)
         this.listLoading = false
+        this.$message.error('加载角色列表失败')
       })
     },
     handleFilter() {
