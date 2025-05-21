@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取租户列表
 export function getTenants(params) {
   return request({
-    url: '/tenants',
+    url: '/tenant/list',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export function getTenants(params) {
 // 获取指定租户
 export function getTenantById(id) {
   return request({
-    url: `/tenants/${id}`,
+    url: `/tenant/${id}`,
     method: 'get'
   })
 }
