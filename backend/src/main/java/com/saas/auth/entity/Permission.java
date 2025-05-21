@@ -1,12 +1,9 @@
 package com.saas.auth.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.saas.auth.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * 权限实体类
@@ -15,35 +12,39 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_permission")
 public class Permission extends BaseEntity {
-
+    
     /**
      * 权限名称
      */
     private String name;
-
+    
     /**
-     * 权限代码
+     * 权限编码
      */
     private String code;
-
+    
+    /**
+     * 权限类型：menu-菜单，button-按钮，api-接口
+     */
+    private String type;
+    
+    /**
+     * 父级ID
+     */
+    private Long parentId;
+    
     /**
      * 资源路径
      */
     private String resourcePath;
-
+    
     /**
-     * 权限类型（MENU:菜单；BUTTON:按钮；API:接口）
+     * 图标
      */
-    private String type;
-
+    private String icon;
+    
     /**
-     * 父权限ID
+     * 排序
      */
-    private Long parentId;
-
-    /**
-     * 子权限列表（非数据库字段）
-     */
-    @TableField(exist = false)
-    private List<Permission> children;
+    private Integer sort;
 }

@@ -12,20 +12,18 @@ import java.time.LocalDateTime;
  */
 @Data
 public class BaseEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+    
     /**
-     * ID
+     * 主键ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
+    
     /**
      * 创建时间
      */
     private LocalDateTime createTime;
-
+    
     /**
      * 更新时间
      */
