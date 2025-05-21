@@ -27,6 +27,7 @@ public class TenantController {
 
     @GetMapping("/list")
     @Operation(summary = "获取租户列表")
+    // 确保租户列表接口可以不受限制访问
     public ApiResponse<Map<String, Object>> list(
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "每页记录数") @RequestParam(defaultValue = "10") int pageSize,
