@@ -35,8 +35,12 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd frontend && npm install && npm run serve"
+args = "cd frontend && npm run serve -- --host 0.0.0.0"
 waitForPort = 5000
 
 [deployment]
 run = ["sh", "-c", "cd backend && ./mvnw spring-boot:run"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
