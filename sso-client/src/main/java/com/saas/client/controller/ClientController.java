@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,8 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class ClientController {
 
-    @Value("${sa-token.sso.auth-url}")
+    @Value("${sso.auth-url}")
     private String ssoServerUrl;
+    
+    @Value("${sso.userinfo-url}")
+    private String userInfoUrl;
+    
+    @Value("${sso.logout-url}")
+    private String logoutUrl;
     
     private final RestTemplate restTemplate = new RestTemplate();
     
@@ -37,18 +42,11 @@ public class ClientController {
     public ModelAndView index() {
         ModelAndView view = new ModelAndView("index.html");
         // 检查session中是否有登录状态
-        boolean isLogin = tokenUserMap.size() > 0 || StpUtil.isLogin();
+        boolean isLogin = tokenUserMap.size() > 0;
         view.addObject("isLogin", isLogin);
         
-        if (isLogin) {
-            // 如果使用sa-token登录
-            if (StpUtil.isLogin()) {
-                view.addObject("userId", StpUtil.getLoginIdAsString());
-            } 
-            // 如果使用自定义token登录
-            else if (tokenUserMap.containsKey("userId")) {
-                view.addObject("userId", tokenUserMap.get("userId"));
-            }
+        if (isLogin && tokenUserMap.containsKey("userId")) {
+            view.addObject("userId", tokenUserMap.get("userId"));
         }
         return view;
     }
@@ -59,7 +57,7 @@ public class ClientController {
     @RequestMapping("/protected")
     public ModelAndView protectedResource() {
         // 检查是否已登录
-        boolean isLogin = tokenUserMap.size() > 0 || StpUtil.isLogin();
+        boolean isLogin = tokenUserMap.size() > 0;
         if (!isLogin) {
             return new ModelAndView("redirect:/sso/login");
         }
@@ -67,10 +65,7 @@ public class ClientController {
         ModelAndView view = new ModelAndView("protected.html");
         
         // 设置用户信息
-        if (StpUtil.isLogin()) {
-            view.addObject("userId", StpUtil.getLoginIdAsString());
-            view.addObject("token", StpUtil.getTokenValue());
-        } else if (tokenUserMap.containsKey("userId")) {
+        if (tokenUserMap.containsKey("userId")) {
             view.addObject("userId", tokenUserMap.get("userId"));
             view.addObject("token", tokenUserMap.get("token"));
         }
@@ -88,7 +83,7 @@ public class ClientController {
     @GetMapping("/sso/login")
     public RedirectView ssoLogin() {
         // 如果已经登录，直接返回首页
-        if (StpUtil.isLogin() || tokenUserMap.size() > 0) {
+        if (tokenUserMap.size() > 0) {
             return new RedirectView("/client/");
         }
         
@@ -124,15 +119,38 @@ public class ClientController {
     @GetMapping("/sso/logout")
     public RedirectView ssoLogout() {
         // 清除本地登录状态
-        if (StpUtil.isLogin()) {
-            StpUtil.logout();
-        }
-        
-        // 清除自定义token存储
         tokenUserMap.clear();
         
         // 跳转到SSO服务器注销
-        String redirectUrl = "http://localhost:8000/api/sso/logout?redirect=http://localhost:9001/client/";
+        String redirectUrl = logoutUrl + "?redirect=http://localhost:9001/client/";
         return new RedirectView(redirectUrl);
+    }
+    
+    /**
+     * 获取用户信息
+     */
+    @GetMapping("/sso/userinfo")
+    public ModelAndView getUserInfo() {
+        if (!tokenUserMap.containsKey("token")) {
+            return new ModelAndView("redirect:/sso/login");
+        }
+        
+        try {
+            // 调用认证服务器获取用户信息
+            String url = userInfoUrl + "?token=" + tokenUserMap.get("token");
+            Map<String, Object> userInfo = restTemplate.getForObject(url, Map.class);
+            
+            // 更新本地用户信息
+            if (userInfo != null && userInfo.containsKey("data")) {
+                Map<String, Object> userData = (Map<String, Object>) userInfo.get("data");
+                tokenUserMap.put("userInfo", userData);
+            }
+            
+            return new ModelAndView("redirect:/protected");
+        } catch (Exception e) {
+            log.error("获取用户信息失败", e);
+            tokenUserMap.clear(); // 清除无效的令牌
+            return new ModelAndView("redirect:/sso/login");
+        }
     }
 }
