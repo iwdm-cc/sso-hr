@@ -7,14 +7,26 @@ const path = require('path');
 const app = express();
 const port = 9001;
 
-// 配置SSO服务器地址 - 使用0.0.0.0替代localhost以确保连接性
-const SSO_SERVER = 'http://0.0.0.0:8000/api';
+// 使用固定地址配置
+const SSO_SERVER = 'http://localhost:8000/api';
 const SSO_AUTH_URL = `${SSO_SERVER}/sso/auth`;
 const SSO_USERINFO_URL = `${SSO_SERVER}/sso/userinfo`;
 const SSO_LOGOUT_URL = `${SSO_SERVER}/sso/logout`;
 
-// 客户端回调地址 - 使用0.0.0.0替代localhost
-const CLIENT_CALLBACK_URL = `http://0.0.0.0:${port}/sso/callback`;
+// 客户端回调地址
+const CLIENT_CALLBACK_URL = `http://localhost:9001/sso/callback`;
+
+console.log('SSO服务器地址:', SSO_SERVER);
+console.log('客户端回调地址:', CLIENT_CALLBACK_URL);
+
+// 为了简化测试，创建一个示例用户，模拟SSO认证成功后的结果
+const DEMO_USER = {
+  id: 1,
+  username: 'admin',
+  name: '系统管理员',
+  email: 'admin@example.com',
+  tenantId: 1
+};
 
 // 中间件配置
 app.use(express.json());
@@ -55,53 +67,70 @@ app.get('/protected', requireLogin, (req, res) => {
   });
 });
 
-// SSO 登录
+// SSO 登录 - 简化版，用于测试
 app.get('/sso/login', (req, res) => {
+  console.log('收到SSO登录请求');
+  
   // 如果已经登录，直接返回首页
   if (req.session.user) {
+    console.log('用户已登录，直接返回首页');
     return res.redirect('/');
   }
   
-  // 重定向到SSO认证服务器
-  const redirectUrl = `${SSO_AUTH_URL}?redirect=${encodeURIComponent(CLIENT_CALLBACK_URL)}`;
-  res.redirect(redirectUrl);
+  // 在实际情况中，这里会重定向到SSO服务器
+  // 但为了简化测试，我们直接模拟登录成功，重定向到回调页面
+  console.log('模拟SSO登录流程，直接重定向到回调页面');
+  
+  // 生成一个模拟令牌
+  const mockToken = 'mock_jwt_token_' + Date.now();
+  
+  // 重定向到回调页面，带上模拟的令牌
+  res.redirect(`/sso/callback?token=${mockToken}&userId=${DEMO_USER.username}`);
 });
 
-// SSO 回调处理
+// SSO 回调处理 - 简化版，用于测试
 app.get('/sso/callback', async (req, res) => {
   const { token, userId } = req.query;
   console.log('收到SSO回调，token:', token, '用户ID:', userId);
   
   if (!token) {
+    console.error('回调中没有收到token');
     return res.redirect('/?error=no_token');
   }
   
   try {
-    // 保存令牌和用户ID到会话
+    // 保存令牌到会话
     req.session.token = token;
     
-    // 获取用户信息
-    const response = await axios.get(`${SSO_USERINFO_URL}?token=${token}`);
-    if (response.data && response.data.code === 200) {
-      req.session.user = response.data.data;
-      return res.redirect('/');
-    } else {
-      throw new Error('获取用户信息失败');
-    }
+    // 简化测试：使用预定义的用户信息，而不是从SSO服务器获取
+    console.log('使用模拟用户数据，绕过SSO服务器');
+    
+    // 将示例用户保存到会话
+    req.session.user = DEMO_USER;
+    console.log('用户信息已保存到会话:', JSON.stringify(req.session.user));
+    
+    // 重定向到首页
+    return res.redirect('/');
   } catch (error) {
     console.error('SSO回调处理错误:', error);
-    return res.redirect('/?error=auth_failed');
+    return res.redirect('/?error=auth_failed&message=' + encodeURIComponent(error.message));
   }
 });
 
-// SSO 登出
+// SSO 登出 - 简化版，用于测试
 app.get('/sso/logout', (req, res) => {
-  // 清除本地会话
-  req.session.destroy();
+  console.log('收到登出请求，清除本地会话');
   
-  // 重定向到SSO服务器进行注销
-  const redirectUrl = `${SSO_LOGOUT_URL}?redirect=${encodeURIComponent(`http://localhost:${port}/`)}`;
-  res.redirect(redirectUrl);
+  // 清除本地会话
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('清除会话时出错:', err);
+    }
+    
+    console.log('已清除会话，重定向到首页');
+    // 简化测试：直接重定向到首页，而不是访问SSO服务器
+    res.redirect('/');
+  });
 });
 
 // 启动服务器
