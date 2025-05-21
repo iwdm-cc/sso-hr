@@ -9,7 +9,7 @@ import com.saas.auth.entity.RolePermission;
 import com.saas.auth.exception.CustomException;
 import com.saas.auth.mapper.RoleMapper;
 import com.saas.auth.mapper.RolePermissionMapper;
-import com.saas.auth.security.TenantContext;
+import com.saas.auth.context.TenantContext;
 import com.saas.auth.service.RoleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

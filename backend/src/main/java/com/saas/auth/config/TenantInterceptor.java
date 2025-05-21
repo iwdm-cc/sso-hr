@@ -1,6 +1,6 @@
 package com.saas.auth.config;
 
-import com.saas.auth.security.TenantContext;
+import com.saas.auth.context.TenantContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -19,7 +19,7 @@ public class TenantInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String tenantId = request.getHeader(TENANT_HEADER);
         if (tenantId != null && !tenantId.isEmpty()) {
-            TenantContext.setCurrentTenant(tenantId);
+            TenantContext.setTenantId(Long.valueOf(tenantId));
         }
         return true;
     }
