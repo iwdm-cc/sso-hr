@@ -41,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/h2-console/**").permitAll() // H2控制台
             .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**").permitAll() // Swagger
             .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            // 临时允许所有数据接口访问，方便测试和开发
+            .antMatchers("/users/**", "/roles/**", "/permissions/**", "/tenants/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
