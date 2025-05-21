@@ -15,6 +15,6 @@ module.exports = {
   },
   lintOnSave: false,
   configureWebpack: {
-    entry: './src/main-basic.js'
+    entry: './src/demo.js'
   }
 }
