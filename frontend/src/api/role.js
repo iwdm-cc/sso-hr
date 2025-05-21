@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取角色列表
 export function getRoles(params) {
   return request({
-    url: '/roles',
+    url: '/role/list',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export function getRoles(params) {
 // 获取指定角色
 export function getRoleById(id) {
   return request({
-    url: `/roles/${id}`,
+    url: `/role/${id}`,
     method: 'get'
   })
 }
