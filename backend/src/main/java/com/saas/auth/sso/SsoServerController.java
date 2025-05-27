@@ -30,30 +30,31 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/sso")
 public class SsoServerController {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private UserMapper userMapper;
-    
+
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     /**
      * SSO-Server端：处理认证请求
      */
     @GetMapping("/auth")
     public ModelAndView auth(@RequestParam(required = false) String redirect) {
+        log.info("SSO认证请求，redirect: {}", redirect);
         // 重定向到登录页面
-        String loginUrl = "/api/sso/sso-login.html";
+        String loginUrl = "sso-login.html";
         if (redirect != null && !redirect.isEmpty()) {
             loginUrl += "?back=" + redirect;
         }
-        
+
         return new ModelAndView("redirect:" + loginUrl);
     }
-    
+
     /**
      * 处理登录请求
      */
@@ -64,33 +65,33 @@ public class SsoServerController {
         try {
             // 设置租户上下文，使用系统默认租户进行认证
             TenantContext.setTenantId(1L);
-            
+
             // 校验用户名和密码
             User user = userMapper.selectByUsernameAndTenantId(username, TenantContext.getTenantId());
             if (user == null) {
                 return ApiResponse.error("用户不存在");
             }
-            
+
             // 此处简化了密码验证，实际应用中应该进行加密比对
             if ("123456".equals(password)) {
                 // 生成JWT令牌
                 String token = jwtUtil.generateToken(user.getUsername(), user.getTenantId());
-                
+
                 // 如果有回调地址，返回令牌用于SSO重定向
                 if (back != null && !back.isEmpty()) {
                     return ApiResponse.success(token);
                 }
-                
+
                 return ApiResponse.success("登录成功");
             }
-            
+
             return ApiResponse.error("密码错误");
         } catch (Exception e) {
             log.error("SSO登录失败", e);
             return ApiResponse.error("登录失败: " + e.getMessage());
         }
     }
-    
+
     /**
      * 查询用户信息
      */
@@ -100,16 +101,16 @@ public class SsoServerController {
             // 验证JWT令牌
             String username = jwtUtil.getUsernameFromToken(token);
             Long tenantId = jwtUtil.getTenantIdFromToken(token);
-            
+
             if (username == null || tenantId == null) {
                 return ApiResponse.error("无效的令牌");
             }
-            
+
             User user = userMapper.selectByUsernameAndTenantId(username, tenantId);
             if (user == null) {
                 return ApiResponse.error("用户不存在");
             }
-            
+
             // 返回用户信息给客户端
             return ApiResponse.success(user);
         } catch (Exception e) {
@@ -117,7 +118,7 @@ public class SsoServerController {
             return ApiResponse.error("获取用户信息失败: " + e.getMessage());
         }
     }
-    
+
     /**
      * 单点登出
      */
@@ -127,7 +128,7 @@ public class SsoServerController {
         if (redirect != null && !redirect.isEmpty()) {
             return new ModelAndView("redirect:" + redirect);
         }
-        
+
         // 否则跳转到登录页
         return new ModelAndView("redirect:/api/sso/sso-login.html");
     }

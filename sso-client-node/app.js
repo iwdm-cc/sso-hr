@@ -8,7 +8,7 @@ const app = express();
 const port = 9001;
 
 // 配置服务器地址，确保在Replit环境中可以正常工作
-const SSO_SERVER = 'http://0.0.0.0:8000/api';  // 使用0.0.0.0替代localhost
+const SSO_SERVER = 'https://user-management-hub-thinkingbird.replit.app/api';  // 使用0.0.0.0替代localhost
 const SSO_AUTH_URL = `${SSO_SERVER}/sso/auth`;
 const SSO_USERINFO_URL = `${SSO_SERVER}/sso/userinfo`;
 const SSO_LOGOUT_URL = `${SSO_SERVER}/sso/logout`;
@@ -56,15 +56,15 @@ const requireLogin = (req, res, next) => {
 
 // 首页
 app.get('/', (req, res) => {
-  res.render('index', { 
+  res.render('index', {
     user: req.session.user,
-    isLogin: !!req.session.user 
+    isLogin: !!req.session.user
   });
 });
 
 // 受保护的资源页面
 app.get('/protected', requireLogin, (req, res) => {
-  res.render('protected', { 
+  res.render('protected', {
     user: req.session.user,
     token: req.session.token
   });
@@ -73,16 +73,16 @@ app.get('/protected', requireLogin, (req, res) => {
 // SSO 登录
 app.get('/sso/login', (req, res) => {
   console.log('收到SSO登录请求');
-  
+
   // 如果已经登录，直接返回首页
   if (req.session.user) {
     console.log('用户已登录，直接返回首页');
     return res.redirect('/');
   }
-  
+
   // 由于在Replit环境中直接访问SSO服务可能有问题
   // 我们将采用两种方式实现SSO：
-  
+
   // 方式一：通过代理页面展示SSO登录表单
   res.send(`
   <!DOCTYPE html>
@@ -233,16 +233,16 @@ app.get('/sso/login', (req, res) => {
 app.get('/sso/handle-login', async (req, res) => {
   const { username, password } = req.query;
   console.log('处理登录请求:', username);
-  
+
   try {
     // 尝试调用后端SSO服务进行登录
     const formData = new URLSearchParams();
     formData.append('username', username);
     formData.append('password', password);
     formData.append('back', CLIENT_CALLBACK_URL);
-    
+
     console.log('正在调用SSO服务器登录接口...');
-    
+
     try {
       const loginResponse = await axios({
         method: 'post',
@@ -253,19 +253,19 @@ app.get('/sso/handle-login', async (req, res) => {
         },
         timeout: 5000
       });
-      
+
       console.log('SSO服务器登录响应:', loginResponse.status);
-      
+
       if (loginResponse.data && loginResponse.data.code === 200) {
         // 登录成功，获取令牌
         const token = loginResponse.data.data;
         console.log('登录成功，获取到令牌:', token);
-        
+
         // 重定向到回调处理，模拟SSO服务器的重定向
         return res.redirect(`/sso/callback?token=${token}&userId=${username}`);
       } else {
         console.error('SSO服务器登录失败:', loginResponse.data);
-        
+
         // 即使后端登录失败，我们也创建一个本地会话（仅用于演示）
         console.log('使用模拟数据进行登录演示');
         const mockToken = 'mock_jwt_token_' + Date.now();
@@ -273,7 +273,7 @@ app.get('/sso/handle-login', async (req, res) => {
       }
     } catch (loginError) {
       console.error('调用SSO服务器登录接口失败:', loginError.message);
-      
+
       // 生成模拟令牌，以便演示流程
       const mockToken = 'mock_jwt_token_' + Date.now();
       return res.redirect(`/sso/callback?token=${mockToken}&userId=${username}`);
@@ -288,19 +288,19 @@ app.get('/sso/handle-login', async (req, res) => {
 app.get('/sso/callback', async (req, res) => {
   const { token, userId } = req.query;
   console.log('收到SSO回调，token:', token, '用户ID:', userId);
-  
+
   if (!token) {
     console.error('回调中没有收到token');
     return res.redirect('/?error=no_token');
   }
-  
+
   try {
     // 保存令牌到会话
     req.session.token = token;
-    
+
     // 尝试从SSO服务器获取用户信息
     console.log('准备从SSO服务器获取用户信息, URL:', `${SSO_USERINFO_URL}?token=${token}`);
-    
+
     try {
       // 设置请求配置
       const axiosConfig = {
@@ -310,11 +310,11 @@ app.get('/sso/callback', async (req, res) => {
           'Accept': 'application/json'
         }
       };
-      
+
       // 从SSO服务器获取用户信息
       const response = await axios.get(`${SSO_USERINFO_URL}?token=${token}`, axiosConfig);
       console.log('SSO服务器响应状态:', response.status);
-      
+
       if (response.data && response.data.code === 200) {
         // 将用户信息保存到会话
         req.session.user = response.data.data;
@@ -330,7 +330,7 @@ app.get('/sso/callback', async (req, res) => {
       }
     } catch (apiError) {
       console.error('调用SSO服务器API失败:', apiError.message);
-      
+
       // 构建基本用户数据
       console.warn('构建基本用户数据');
       req.session.user = {
@@ -340,7 +340,7 @@ app.get('/sso/callback', async (req, res) => {
         tenantId: 1
       };
     }
-    
+
     // 重定向到首页
     return res.redirect('/');
   } catch (error) {
@@ -352,19 +352,19 @@ app.get('/sso/callback', async (req, res) => {
 // SSO 登出 - 连接到真实的SSO服务器
 app.get('/sso/logout', (req, res) => {
   console.log('收到登出请求');
-  
+
   // 清除本地会话
   req.session.destroy((err) => {
     if (err) {
       console.error('清除会话时出错:', err);
     }
-    
+
     // 构建SSO登出URL，包含回调地址
     const logoutRedirectUrl = encodeURIComponent(`http://localhost:${port}/`);
     const ssoLogoutUrl = `${SSO_LOGOUT_URL}?redirect=${logoutRedirectUrl}`;
-    
+
     console.log('重定向到SSO服务器登出:', ssoLogoutUrl);
-    
+
     // 重定向到SSO服务器进行登出
     res.redirect(ssoLogoutUrl);
   });

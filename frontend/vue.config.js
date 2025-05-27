@@ -1,7 +1,7 @@
 module.exports = {
   devServer: {
     port: 5000,
-    host: '0.0.0.0', 
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
@@ -10,7 +10,7 @@ module.exports = {
         pathRewrite: null
       }
     },
-    allowedHosts: 'all'
+    allowedHosts: ['all'] // 修改为数组格式
   },
   lintOnSave: false
 }
